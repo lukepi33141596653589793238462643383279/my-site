@@ -20,7 +20,7 @@
     }
 
     #appContainer {
-      display: flex;
+      display: none; /* 🔴 começa escondido */
       height: calc(100vh - 50px);
     }
 
@@ -124,7 +124,7 @@
     University Chat for Software Engineering
   </header>
 
-  <!-- LOGIN SCREEN (SIMPLES) -->
+  <!-- LOGIN -->
   <div id="loginBox">
     <h2>Login</h2>
 
@@ -137,31 +137,27 @@
   <!-- APP -->
   <div id="appContainer">
 
-    <!-- SIDEBAR -->
     <div id="sidebar">
       <button class="serverBtn">G</button>
       <button class="serverBtn">AI</button>
       <button class="serverBtn">S</button>
     </div>
 
-    <!-- CHAT -->
     <div id="chat">
-
       <div id="posts"></div>
 
       <div id="inputArea">
         <input id="postInput" placeholder="Write a message..." />
         <button class="send" onclick="createPost()">Send</button>
       </div>
-
     </div>
 
   </div>
 
-  <!-- JS -->
+  <!-- INDEX LOGIC -->
   <script type="module" src="./index.js"></script>
 
-  <!-- LOGIN BRIDGE -->
+  <!-- LOGIN -->
   <script type="module">
     import { login } from "./auth.js";
 
@@ -172,7 +168,11 @@
       const user = login(u, p);
 
       if (user) {
-        location.reload();
+        // 🔥 troca de tela sem reload
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("appContainer").style.display = "flex";
+      } else {
+        alert("Login inválido");
       }
     };
   </script>
