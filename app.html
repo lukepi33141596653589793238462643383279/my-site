@@ -1,7 +1,6 @@
-
 <body>
 
-  <!-- 🧯 FALLBACK ROOT (caso tudo falhe) -->
+  <!-- 🧯 FALLBACK ROOT -->
   <div id="fallback-root"></div>
 
   <!-- HEADER -->
@@ -13,27 +12,16 @@
   <div id="appContainer"
     style="display:flex;height:100vh;background:#36393f;color:white;">
 
-    <!-- SIDEBAR SERVERS -->
+    <!-- SIDEBAR -->
     <div style="width:80px;background:#202225;display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:10px;">
 
-      <button class="serverBtn" data-server="general"
-        style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">
-        G
-      </button>
-
-      <button class="serverBtn" data-server="ai"
-        style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">
-        AI
-      </button>
-
-      <button class="serverBtn" data-server="study"
-        style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">
-        S
-      </button>
+      <button class="serverBtn">G</button>
+      <button class="serverBtn">AI</button>
+      <button class="serverBtn">S</button>
 
     </div>
 
-    <!-- CHAT AREA -->
+    <!-- CHAT -->
     <div style="flex:1;display:flex;flex-direction:column;">
 
       <!-- POSTS -->
@@ -60,7 +48,7 @@
 
 
   <!-- ========================= -->
-  <!-- 🧯 ERROR HANDLER PRIMEIRO -->
+  <!-- 🧯 ERROR HANDLER -->
   <!-- ========================= -->
   <script type="module">
     import "./error-handler.js";
@@ -68,64 +56,93 @@
 
 
   <!-- ========================= -->
-  <!-- 🚀 FIREBASE / APP SCRIPT -->
+  <!-- 🚀 APP SCRIPT (SEM FIREBASE AUTH) -->
   <!-- ========================= -->
   <script type="module">
 
-    // 🔥 IMPORTAÇÕES SEGURAS
     import {
-      loginGoogle,
       createPost,
-      onUserChange,
       listenPosts
     } from "./firebase.js";
 
+    import { getUser } from "./auth.js";
+
 
     // =========================
-    // 🧠 SAFE DOM REFERENCES
+    // 🧠 STATE
     // =========================
+    let currentUser = getUser();
+
     const postsEl = document.getElementById("posts");
     const inputEl = document.getElementById("postInput");
     const sendBtn = document.getElementById("sendBtn");
 
 
     // =========================
-    // 🔐 USER STATE SAFE
+    // 🔐 CHECK LOGIN (SIMPLES)
     // =========================
-    let currentUser = null;
+    function checkLogin() {
+      currentUser = getUser();
 
-    onUserChange((user) => {
-      currentUser = user;
-
-      if (!user) {
-        showFallbackIfNeeded();
+      if (!currentUser) {
+        showLoginBlock();
       }
-    });
+    }
+
+    function showLoginBlock() {
+      const root = document.getElementById("fallback-root");
+
+      root.innerHTML = `
+        <div style="
+          position:fixed;
+          top:0;left:0;
+          width:100%;height:100%;
+          background:#202225;
+          display:flex;
+          flex-direction:column;
+          justify-content:center;
+          align-items:center;
+          color:white;
+          z-index:9999;
+        ">
+          <h2>⚠️ Login required</h2>
+          <p>Please login in the main page</p>
+          <button onclick="location.href='index.html'"
+            style="padding:10px;background:#5865f2;border:none;color:white;border-radius:6px;">
+            Go to Login
+          </button>
+        </div>
+      `;
+    }
 
 
     // =========================
-    // 💬 SEND MESSAGE SAFE
+    // 💬 SEND MESSAGE
     // =========================
     async function safeSend() {
       try {
-        if (!inputEl || !inputEl.value.trim()) return;
+        const text = inputEl.value.trim();
+        if (!text) return;
 
-        await createPost(inputEl.value, currentUser);
+        if (!currentUser) {
+          alert("You must be logged in");
+          return;
+        }
+
+        await createPost(text, currentUser);
 
         inputEl.value = "";
 
       } catch (err) {
-        console.error("Send error:", err);
+        console.error(err);
       }
     }
 
 
     // =========================
-    // 📡 REALTIME POSTS SAFE
+    // 📡 REALTIME POSTS
     // =========================
     listenPosts((posts) => {
-      if (!postsEl) return;
-
       postsEl.innerHTML = "";
 
       posts.forEach(p => {
@@ -146,7 +163,7 @@
 
 
     // =========================
-    // 🖱 EVENTS SAFE
+    // 🖱 EVENTS
     // =========================
     sendBtn?.addEventListener("click", safeSend);
 
@@ -156,37 +173,9 @@
 
 
     // =========================
-    // 🧯 FALLBACK UI (ANTI TELA BRANCA)
+    // 🚀 INIT
     // =========================
-    function showFallbackIfNeeded() {
-      const fallback = document.getElementById("fallback-root");
-
-      if (!fallback) return;
-
-      if (!currentUser) {
-        fallback.innerHTML = `
-          <div style="
-            position:fixed;
-            top:0;left:0;
-            width:100%;height:100%;
-            background:#202225;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            color:white;
-            z-index:9999;
-          ">
-            <h2>⚠️ You are not logged in</h2>
-            <p>Please login to continue</p>
-            <button onclick="location.href='index.html'"
-              style="padding:10px;background:#5865f2;border:none;color:white;border-radius:6px;">
-              Go to Login
-            </button>
-          </div>
-        `;
-      }
-    }
+    checkLogin();
 
   </script>
 
