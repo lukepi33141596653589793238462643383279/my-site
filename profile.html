@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Profile - University Chat</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #36393f;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .box {
+      background: #2f3136;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background: #40444b;
+      color: white;
+    }
+
+    button {
+      background: #5865f2;
+      border: none;
+      padding: 12px;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #4752c4;
+    }
+
+    .title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .userInfo {
+      font-size: 12px;
+      color: #b9bbbe;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+    <div class="title">Create your profile</div>
+
+    <div class="userInfo" id="userInfo"></div>
+
+    <input id="username" placeholder="Username" />
+
+    <input id="password" type="password" placeholder="Password (6-256 chars)" />
+
+    <button onclick="saveProfile()">Continue</button>
+  </div>
+
+  <script type="module">
+    import {
+      db,
+      doc,
+      setDoc
+    } from "./firebase.js";
+
+    // pega usuário do login anterior
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("userInfo").innerText =
+      "Logged in as: " + user.email;
+
+    window.saveProfile = async function () {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      // validações
+      if (!username) {
+        alert("Username required");
+        return;
+      }
+
+      if (password.length < 6 || password.length > 256) {
+        alert("Password must be 6 to 256 characters");
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          username: username,
+          email: user.email,
+          photo: user.photoURL,
+          password: password,
+          createdAt: Date.now()
+        });
+
+        // vai para o app principal
+        window.location.href = "app.html";
+
+      } catch (error) {
+        console.error(error);
+        alert("Error creating profile");
+      }
+    };
+  </script>
+
+</body>
+</html>
