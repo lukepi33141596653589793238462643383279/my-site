@@ -23,20 +23,22 @@ import {
 
 
 // =========================
-// 🔧 CONFIGURAÇÃO FIREBASE (OBRIGATÓRIO)
+// 🔧 FIREBASE CONFIG (OBRIGATÓRIO)
 // =========================
+// ⚠️ AQUI NÃO PODE SER "SEU_API_KEY"
+// TEM QUE SER O VALOR REAL DO FIREBASE CONSOLE
 const firebaseConfig = {
-  apiKey: "SEU_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJECT_ID",
-  storageBucket: "SEU_PROJECT_ID.appspot.com",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "COLE_SUA_API_KEY_REAL_AQUI",
+  authDomain: "COLE_SEU_PROJETO.firebaseapp.com",
+  projectId: "COLE_SEU_PROJECT_ID",
+  storageBucket: "COLE_SEU_PROJECT_ID.appspot.com",
+  messagingSenderId: "COLE_SEU_SENDER_ID",
+  appId: "COLE_SEU_APP_ID"
 };
 
 
 // =========================
-// 🚀 INIT (EVITA DUPLICAÇÃO)
+// 🚀 INIT
 // =========================
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -45,14 +47,18 @@ const provider = new GoogleAuthProvider();
 
 
 // =========================
-// 🔐 AUTH SAFE (COM ERRO REAL)
+// 🔐 LOGIN (COM ERRO REAL)
 // =========================
 const loginWithGoogle = async () => {
   try {
     return await signInWithPopup(auth, provider);
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
-    alert("Login failed: " + error.message);
+    console.error("🔥 LOGIN ERROR REAL:", error.code, error.message);
+
+    // Mostra erro real (isso é importante pra debug)
+    alert(`Login failed: ${error.message}`);
+
+    throw error; // mantém erro visível
   }
 };
 
@@ -62,7 +68,7 @@ const onUserChange = (callback) => onAuthStateChanged(auth, callback);
 
 
 // =========================
-// 💬 FIRESTORE HELPERS
+// 💬 FIRESTORE
 // =========================
 const sendMessage = async (text, user) => {
   if (!user || !text) return;
@@ -80,9 +86,9 @@ const listenMessages = (callback) => {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+    callback(snapshot.docs.map(d => ({
+      id: d.id,
+      ...d.data()
     })));
   });
 };
@@ -95,11 +101,9 @@ export {
   auth,
   db,
   provider,
-
   loginWithGoogle,
   logoutUser,
   onUserChange,
-
   sendMessage,
   listenMessages
 };
