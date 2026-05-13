@@ -1,3 +1,4 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
@@ -17,61 +18,76 @@ import {
 
 
 // ======================
-// 🌐 GLOBAL MESSAGE
+// 🌐 CONSTANT
 // ======================
 const WELCOME_MESSAGE = "Welcome to the academic and university forum";
+
+
+// ======================
+// 🧯 FALLBACK SAFE (100% SAFE)
+// ======================
+function showFallback(message) {
+  const create = () => {
+    let fallback = document.getElementById("fallback");
+
+    if (!fallback) {
+      fallback = document.createElement("div");
+      fallback.id = "fallback";
+
+      fallback.style.cssText = `
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:#202225;
+        color:white;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        align-items:center;
+        z-index:99999;
+        font-family:Arial;
+      `;
+
+      document.body.appendChild(fallback);
+    }
+
+    fallback.innerHTML = `
+      <h2>⚠️ System Error</h2>
+      <p>${message}</p>
+      <button onclick="location.reload()"
+        style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;cursor:pointer;">
+        Reload
+      </button>
+    `;
+  };
+
+  // garante DOM pronto
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", create);
+  } else {
+    create();
+  }
+}
 
 
 // ======================
 // 🧯 GLOBAL ERROR PROTECTION
 // ======================
 window.addEventListener("error", (e) => {
-  console.error("Global Error:", e.error);
+  console.error(e.error);
   showFallback("Unexpected error occurred.");
 });
 
 window.addEventListener("unhandledrejection", (e) => {
-  console.error("Promise Error:", e.reason);
-  showFallback("Unexpected async error occurred.");
+  console.error(e.reason);
+  showFallback("Async error occurred.");
 });
-
-function showFallback(message) {
-  let fallback = document.getElementById("fallback");
-
-  if (!fallback) {
-    fallback = document.createElement("div");
-    fallback.id = "fallback";
-
-    fallback.style.position = "fixed";
-    fallback.style.top = "0";
-    fallback.style.left = "0";
-    fallback.style.width = "100%";
-    fallback.style.height = "100%";
-    fallback.style.background = "#202225";
-    fallback.style.color = "white";
-    fallback.style.display = "flex";
-    fallback.style.flexDirection = "column";
-    fallback.style.justifyContent = "center";
-    fallback.style.alignItems = "center";
-    fallback.style.zIndex = "9999";
-    fallback.style.fontFamily = "Arial";
-
-    document.body.appendChild(fallback);
-  }
-
-  fallback.innerHTML = `
-    <h2>⚠️ System Error</h2>
-    <p>${message}</p>
-    <button onclick="location.reload()"
-      style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;cursor:pointer;">
-      Reload
-    </button>
-  `;
-}
 
 
 // ======================
-// 🔧 FIREBASE INIT SAFETY
+// 🔧 FIREBASE SAFE INIT
 // ======================
 let app, auth, db, provider;
 
@@ -91,24 +107,24 @@ try {
   provider = new GoogleAuthProvider();
 
 } catch (err) {
-  console.error("Firebase Init Error:", err);
+  console.error(err);
   showFallback("Firebase failed to initialize.");
 }
 
 
 // ======================
-// 👤 USER STATE SAFE
+// 👤 STATE
 // ======================
 let currentUser = null;
 
 
 // ======================
-// 🔐 LOGIN GOOGLE SAFE
+// 🔐 LOGIN SAFE
 // ======================
 async function loginGoogle() {
   try {
     if (!auth || !provider) {
-      showFallback("Auth system not ready.");
+      showFallback("Auth not ready");
       return;
     }
 
@@ -120,9 +136,9 @@ async function loginGoogle() {
 
     alert(`${WELCOME_MESSAGE}\n\nWelcome ${currentUser.displayName}`);
 
-  } catch (error) {
-    console.error("Login error:", error);
-    showFallback("Login failed. Try again.");
+  } catch (err) {
+    console.error(err);
+    showFallback("Login failed");
   }
 }
 
@@ -133,17 +149,18 @@ async function loginGoogle() {
 async function createPost() {
   try {
     const input = document.getElementById("postInput");
-    const text = input?.value?.trim();
+    if (!input) return;
 
+    const text = input.value.trim();
     if (!text) return;
 
     if (!currentUser) {
-      alert("You must be logged in to post.");
+      showFallback("You must be logged in");
       return;
     }
 
     if (!db) {
-      showFallback("Database not available.");
+      showFallback("Database not ready");
       return;
     }
 
@@ -157,54 +174,65 @@ async function createPost() {
 
     input.value = "";
 
-  } catch (error) {
-    console.error("Error creating post:", error);
-    showFallback("Failed to send message.");
+  } catch (err) {
+    console.error(err);
+    showFallback("Failed to send message");
   }
 }
 
 
 // ======================
-// 📡 REALTIME POSTS SAFE
+// 📡 REALTIME SAFE INIT
 // ======================
-try {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-
-  onSnapshot(q, (snapshot) => {
+function initRealtime() {
+  try {
     const container = document.getElementById("posts");
-    if (!container) return;
+    if (!container) {
+      showFallback("UI not loaded");
+      return;
+    }
 
-    container.innerHTML = "";
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
-    // welcome message
-    const welcomeDiv = document.createElement("div");
-    welcomeDiv.className = "post";
-    welcomeDiv.innerHTML = `<p><b>${WELCOME_MESSAGE}</b></p>`;
-    container.appendChild(welcomeDiv);
+    onSnapshot(q, (snapshot) => {
+      container.innerHTML = "";
 
-    snapshot.forEach((docSnap) => {
-      const post = docSnap.data();
+      const welcomeDiv = document.createElement("div");
+      welcomeDiv.innerHTML = `<b>${WELCOME_MESSAGE}</b>`;
+      container.appendChild(welcomeDiv);
 
-      const div = document.createElement("div");
-      div.className = "post";
+      snapshot.forEach((docSnap) => {
+        const post = docSnap.data();
 
-      div.innerHTML = `
-        <p><b>${post.user || "Unknown"}</b></p>
-        <p>${post.text || ""}</p>
-      `;
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><b>${post.user || "Unknown"}</b></p>
+          <p>${post.text || ""}</p>
+        `;
 
-      container.appendChild(div);
+        container.appendChild(div);
+      });
     });
-  });
 
-} catch (err) {
-  console.error("Firestore listener error:", err);
-  showFallback("Failed to load messages.");
+  } catch (err) {
+    console.error(err);
+    showFallback("Realtime failed");
+  }
 }
 
 
 // ======================
-// 🌍 GLOBAL EXPORT SAFE
+// 🚀 START ONLY WHEN READY
+// ======================
+window.addEventListener("DOMContentLoaded", () => {
+  if (db) {
+    initRealtime();
+  }
+});
+
+
+// ======================
+// 🌍 EXPORT SAFE
 // ======================
 window.loginGoogle = loginGoogle;
 window.createPost = createPost;
