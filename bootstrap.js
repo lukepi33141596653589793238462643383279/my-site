@@ -1,11 +1,8 @@
-
 // ======================
-// 🧠 BOOTSTRAP - APP INIT CORE
+// 🧠 BOOTSTRAP - SIMPLIFIED CORE
 // ======================
 
-// 🔥 Firebase Core
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
@@ -23,16 +20,14 @@ const firebaseConfig = {
 
 
 // ======================
-// 🚀 INIT SAFETY WRAPPER
+// 🚀 INIT SAFE
 // ======================
 let app = null;
-let auth = null;
 let db = null;
-let provider = null;
 
 
 // ======================
-// 🧯 FALLBACK SYSTEM (ANTI CRASH GLOBAL)
+// 🧯 FALLBACK (ANTI CRASH)
 // ======================
 function crashSafe(message) {
   let fallback = document.getElementById("bootstrap-fallback");
@@ -41,19 +36,21 @@ function crashSafe(message) {
     fallback = document.createElement("div");
     fallback.id = "bootstrap-fallback";
 
-    fallback.style.position = "fixed";
-    fallback.style.top = "0";
-    fallback.style.left = "0";
-    fallback.style.width = "100%";
-    fallback.style.height = "100%";
-    fallback.style.background = "#202225";
-    fallback.style.color = "white";
-    fallback.style.display = "flex";
-    fallback.style.flexDirection = "column";
-    fallback.style.justifyContent = "center";
-    fallback.style.alignItems = "center";
-    fallback.style.zIndex = "99999";
-    fallback.style.fontFamily = "Arial";
+    fallback.style.cssText = `
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#202225;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      z-index:99999;
+      font-family:Arial;
+    `;
 
     document.body.appendChild(fallback);
   }
@@ -62,7 +59,7 @@ function crashSafe(message) {
     <h2>⚠️ Bootstrap Error</h2>
     <p>${message}</p>
     <button onclick="location.reload()"
-      style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;cursor:pointer;">
+      style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;">
       Reload App
     </button>
   `;
@@ -70,47 +67,37 @@ function crashSafe(message) {
 
 
 // ======================
-// 🔧 BOOTSTRAP INIT FUNCTION
+// 🚀 INIT FUNCTION
 // ======================
 function initFirebase() {
   try {
     app = initializeApp(firebaseConfig);
-
-    auth = getAuth(app);
     db = getFirestore(app);
-    provider = new GoogleAuthProvider();
 
-    console.log("✅ Firebase initialized successfully");
+    console.log("✅ Firebase initialized (Firestore only)");
 
-    return {
-      app,
-      auth,
-      db,
-      provider
-    };
+    return { app, db };
 
   } catch (err) {
-    console.error("Bootstrap Firebase error:", err);
-    crashSafe("Firebase failed to initialize.");
+    console.error("Bootstrap error:", err);
+    crashSafe("Firebase initialization failed.");
     return null;
   }
 }
 
 
 // ======================
-// 🚀 EXPORT SINGLE INIT POINT
+// 🚀 EXPORT CLEAN
 // ======================
 const firebase = initFirebase();
 
 export const appInstance = firebase?.app;
-export const authInstance = firebase?.auth;
 export const dbInstance = firebase?.db;
-export const providerInstance = firebase?.provider;
 
 
 // ======================
-// 🧠 STATUS CHECK (OPTIONAL DEBUG)
+// 🧠 STATUS CHECK
 // ======================
 export function isFirebaseReady() {
-  return !!(appInstance && authInstance && dbInstance);
+  return !!dbInstance;
 }
