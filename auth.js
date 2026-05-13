@@ -1,62 +1,20 @@
-
 // ======================
-// 🔐 AUTH MODULE (BOOTSTRAP BASED)
+// 🔐 AUTH MODULE (CLEAN VERSION)
 // ======================
 
 import {
-  authInstance,
-  providerInstance
-} from "./bootstrap.js";
-
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  auth,
+  provider,
+  loginWithGoogle,
+  logoutUser,
+  onUserChange
+} from "./firebase.js";
 
 
 // ======================
-// 🧠 STATE SAFE
+// 🧠 STATE
 // ======================
 let currentUser = null;
-
-
-// ======================
-// 🧯 SAFE FALLBACK (NUNCA TELA BRANCA)
-// ======================
-function authFallback(message) {
-  let el = document.getElementById("auth-fallback");
-
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "auth-fallback";
-
-    el.style.position = "fixed";
-    el.style.top = "0";
-    el.style.left = "0";
-    el.style.width = "100%";
-    el.style.height = "100%";
-    el.style.background = "#202225";
-    el.style.color = "white";
-    el.style.display = "flex";
-    el.style.flexDirection = "column";
-    el.style.justifyContent = "center";
-    el.style.alignItems = "center";
-    el.style.zIndex = "99999";
-    el.style.fontFamily = "Arial";
-
-    document.body.appendChild(el);
-  }
-
-  el.innerHTML = `
-    <h2>⚠️ Auth Error</h2>
-    <p>${message}</p>
-    <button onclick="location.reload()"
-      style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;cursor:pointer;">
-      Reload
-    </button>
-  `;
-}
 
 
 // ======================
@@ -64,21 +22,16 @@ function authFallback(message) {
 // ======================
 export async function loginGoogle() {
   try {
-    if (!authInstance || !providerInstance) {
-      authFallback("Auth system not ready");
-      return null;
-    }
+    const user = await loginWithGoogle();
+    currentUser = user?.user || null;
 
-    const result = await signInWithPopup(authInstance, providerInstance);
-    currentUser = result.user;
-
-    console.log("✅ User logged in:", currentUser.displayName);
+    console.log("✅ Login success:", currentUser?.displayName);
 
     return currentUser;
 
   } catch (err) {
-    console.error("Login error:", err);
-    authFallback("Google login failed");
+    console.error("❌ Login error (REAL):", err);
+    alert("Login failed: " + err.message);
     return null;
   }
 }
@@ -87,49 +40,33 @@ export async function loginGoogle() {
 // ======================
 // 🚪 LOGOUT
 // ======================
-export async function logoutUser() {
+export async function logout() {
   try {
-    if (!authInstance) {
-      authFallback("Auth not initialized");
-      return;
-    }
-
-    await signOut(authInstance);
+    await logoutUser();
     currentUser = null;
 
-    console.log("🚪 User logged out");
+    console.log("🚪 Logged out");
 
   } catch (err) {
-    console.error("Logout error:", err);
-    authFallback("Logout failed");
+    console.error("❌ Logout error:", err);
+    alert("Logout failed: " + err.message);
   }
 }
 
 
 // ======================
-// 👤 AUTH STATE LISTENER
+// 👤 AUTH STATE
 // ======================
-export function onUserChange(callback) {
-  try {
-    if (!authInstance) {
-      authFallback("Auth listener failed");
-      return;
-    }
-
-    onAuthStateChanged(authInstance, (user) => {
-      currentUser = user;
-      callback(user);
-    });
-
-  } catch (err) {
-    console.error("Auth state error:", err);
-    authFallback("Auth state listener crashed");
-  }
+export function initAuth(callback) {
+  onUserChange((user) => {
+    currentUser = user;
+    callback(user);
+  });
 }
 
 
 // ======================
-// 🧠 GET CURRENT USER SAFE
+// 🧠 GET USER
 // ======================
 export function getCurrentUser() {
   return currentUser;
