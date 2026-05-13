@@ -1,16 +1,8 @@
-// 🔥 Firebase Core
+// =========================
+// 🔥 FIREBASE CORE (SÓ FIRESTORE)
+// =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-// 🔐 AUTH
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-// 🧠 FIRESTORE
 import {
   getFirestore,
   collection,
@@ -23,10 +15,8 @@ import {
 
 
 // =========================
-// 🔧 FIREBASE CONFIG (OBRIGATÓRIO)
+// 🔧 FIREBASE CONFIG
 // =========================
-// ⚠️ AQUI NÃO PODE SER "SEU_API_KEY"
-// TEM QUE SER O VALOR REAL DO FIREBASE CONSOLE
 const firebaseConfig = {
   apiKey: "COLE_SUA_API_KEY_REAL_AQUI",
   authDomain: "COLE_SEU_PROJETO.firebaseapp.com",
@@ -41,69 +31,44 @@ const firebaseConfig = {
 // 🚀 INIT
 // =========================
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
 
 
 // =========================
-// 🔐 LOGIN (COM ERRO REAL)
+// 💬 SEND POST (USA USER LOCAL)
 // =========================
-const loginWithGoogle = async () => {
-  try {
-    return await signInWithPopup(auth, provider);
-  } catch (error) {
-    console.error("🔥 LOGIN ERROR REAL:", error.code, error.message);
-
-    // Mostra erro real (isso é importante pra debug)
-    alert(`Login failed: ${error.message}`);
-
-    throw error; // mantém erro visível
-  }
-};
-
-const logoutUser = () => signOut(auth);
-
-const onUserChange = (callback) => onAuthStateChanged(auth, callback);
-
-
-// =========================
-// 💬 FIRESTORE
-// =========================
-const sendMessage = async (text, user) => {
+const createPost = async (text, user) => {
   if (!user || !text) return;
 
-  return await addDoc(collection(db, "messages"), {
+  return await addDoc(collection(db, "posts"), {
     text,
+    user: user.displayName,
     uid: user.uid,
-    name: user.displayName,
-    photo: user.photoURL || null,
     createdAt: serverTimestamp()
   });
 };
 
-const listenMessages = (callback) => {
-  const q = query(collection(db, "messages"), orderBy("createdAt"));
+
+// =========================
+// 📡 LISTEN POSTS
+// =========================
+const listenPosts = (callback) => {
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(d => ({
-      id: d.id,
-      ...d.data()
+    callback(snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
     })));
   });
 };
 
 
 // =========================
-// 🌐 EXPORT
+// 🌐 EXPORT (LIMPO)
 // =========================
 export {
-  auth,
   db,
-  provider,
-  loginWithGoogle,
-  logoutUser,
-  onUserChange,
-  sendMessage,
-  listenMessages
+  createPost,
+  listenPosts
 };
