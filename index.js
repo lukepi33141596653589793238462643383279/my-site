@@ -5,7 +5,7 @@ const WELCOME_MESSAGE = "Welcome to the academic and university forum";
 
 
 // ======================
-// 🧯 SAFE FALLBACK
+// 🧯 FALLBACK ERROR
 // ======================
 function showFallback(message) {
   let el = document.getElementById("fallback");
@@ -45,42 +45,13 @@ function showFallback(message) {
 
 
 // ======================
-// 🧯 GLOBAL ERRORS
-// ======================
-window.addEventListener("error", (e) => {
-  console.error(e.error);
-  showFallback("Unexpected error occurred");
-});
-
-window.addEventListener("unhandledrejection", (e) => {
-  console.error(e.reason);
-  showFallback("Async error occurred");
-});
-
-
-// ======================
-// 🔥 IMPORT FIRESTORE (CORREÇÃO PRINCIPAL)
-// ======================
-import {
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-import { db } from "./firebase.js";
-
-
-// ======================
 // 👤 USER STATE
 // ======================
 let currentUser = null;
 
 
 // ======================
-// 🔐 LOGIN (SIMPLES)
+// 🔐 LOGIN (AGORA COMPATÍVEL COM index.html)
 // ======================
 function login(username, password) {
   const USERS = {
@@ -88,6 +59,7 @@ function login(username, password) {
   };
 
   if (USERS[username] && USERS[username] === password) {
+
     currentUser = {
       uid: username,
       displayName: username
@@ -95,10 +67,12 @@ function login(username, password) {
 
     localStorage.setItem("user", JSON.stringify(currentUser));
 
+    // 🔥 MOSTRAR APP (SEM reload)
     const loginBox = document.getElementById("loginBox");
-    if (loginBox) loginBox.style.display = "none";
+    const app = document.getElementById("appContainer");
 
-    console.log("Logged:", currentUser.displayName);
+    if (loginBox) loginBox.style.display = "none";
+    if (app) app.style.display = "flex";
 
     return currentUser;
   }
@@ -116,12 +90,18 @@ function restoreUser() {
 
   if (saved) {
     currentUser = JSON.parse(saved);
+
+    const loginBox = document.getElementById("loginBox");
+    const app = document.getElementById("appContainer");
+
+    if (loginBox) loginBox.style.display = "none";
+    if (app) app.style.display = "flex";
   }
 }
 
 
 // ======================
-// 📝 CREATE POST
+// 📝 CREATE POST (SAFE MODE SEM FIREBASE ERRO)
 // ======================
 async function createPost() {
   try {
@@ -136,12 +116,17 @@ async function createPost() {
       return;
     }
 
-    await addDoc(collection(db, "posts"), {
-      text,
-      user: currentUser.displayName || "Unknown",
-      uid: currentUser.uid,
-      createdAt: serverTimestamp()
-    });
+    // 🔥 TEMPORÁRIO (SEM FIREBASE PRA NÃO QUEBRAR AGORA)
+    const container = document.getElementById("posts");
+
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p><b>${currentUser.displayName}</b></p>
+      <p>${text}</p>
+      <hr/>
+    `;
+
+    container.prepend(div);
 
     input.value = "";
 
@@ -153,47 +138,20 @@ async function createPost() {
 
 
 // ======================
-// 📡 REALTIME POSTS
+// 📡 CHAT INIT
 // ======================
 function initChat() {
-  try {
-    const container = document.getElementById("posts");
-    if (!container) {
-      showFallback("UI not found");
-      return;
-    }
+  const container = document.getElementById("posts");
+  if (!container) return;
 
-    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-
-    onSnapshot(q, (snapshot) => {
-      container.innerHTML = "";
-
-      const welcome = document.createElement("div");
-      welcome.innerHTML = `<b>${WELCOME_MESSAGE}</b>`;
-      container.appendChild(welcome);
-
-      snapshot.forEach((docSnap) => {
-        const post = docSnap.data();
-
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <p><b>${post.user || "Unknown"}</b></p>
-          <p>${post.text || ""}</p>
-        `;
-
-        container.appendChild(div);
-      });
-    });
-
-  } catch (err) {
-    console.error(err);
-    showFallback("Chat failed to load");
-  }
+  container.innerHTML = `
+    <div><b>${WELCOME_MESSAGE}</b></div>
+  `;
 }
 
 
 // ======================
-// 🚀 INIT APP
+// 🚀 INIT
 // ======================
 window.addEventListener("DOMContentLoaded", () => {
   restoreUser();
@@ -202,7 +160,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 // ======================
-// 🌍 EXPORT
+// 🌍 EXPORT GLOBAL
 // ======================
 window.login = login;
 window.createPost = createPost;
