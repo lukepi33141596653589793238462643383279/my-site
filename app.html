@@ -1,0 +1,41 @@
+<body>
+
+  <!-- HEADER -->
+  <header style="background:#2f3136;padding:12px;color:white;font-weight:bold;">
+    University Chat for Software Engineering
+  </header>
+
+  <!-- APP CONTAINER -->
+  <div style="display:flex;height:100vh;background:#36393f;color:white;">
+
+    <!-- SERVERS SIDEBAR -->
+    <div style="width:80px;background:#202225;display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:10px;">
+      <button onclick="switchServer('general')" style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">G</button>
+      <button onclick="switchServer('ai')" style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">AI</button>
+      <button onclick="switchServer('study')" style="width:50px;height:50px;border-radius:50%;background:#5865f2;border:none;color:white;">S</button>
+    </div>
+
+    <!-- MAIN CHAT -->
+    <div style="flex:1;display:flex;flex-direction:column;">
+
+      <!-- POSTS AREA -->
+      <div id="posts"
+        style="flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px;">
+      </div>
+
+      <!-- INPUT AREA -->
+      <div style="display:flex;padding:10px;background:#2f3136;">
+        <input id="postInput"
+          style="flex:1;padding:10px;border:none;border-radius:6px;background:#40444b;color:white;"
+          placeholder="Write a message..." />
+
+        <button onclick="createPost()"
+          style="margin-left:10px;background:#5865f2;border:none;color:white;padding:10px 15px;border-radius:6px;">
+          Send
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</body>
