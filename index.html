@@ -1,12 +1,24 @@
-<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// 🌐 Welcome message (global system message)
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🌐 MESSAGE GLOBAL
 const WELCOME_MESSAGE = "Welcome to the academic and university forum";
 
-// Firebase config
+// 🔧 CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "COLE_AQUI",
   authDomain: "COLE_AQUI",
@@ -16,34 +28,45 @@ const firebaseConfig = {
   appId: "COLE_AQUI"
 };
 
+// 🚀 INIT
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// 🔐 Provider único (melhor prática)
+const provider = new GoogleAuthProvider();
+
 let currentUser = null;
 
-// 🔐 LOGIN GOOGLE
-window.loginGoogle = async function () {
-  const provider = new GoogleAuthProvider();
 
+// ======================
+// 🔐 LOGIN GOOGLE
+// ======================
+async function loginGoogle() {
   try {
     const result = await signInWithPopup(auth, provider);
     currentUser = result.user;
 
-    document.getElementById("loginBox").style.display = "none";
+    const loginBox = document.getElementById("loginBox");
+    if (loginBox) loginBox.style.display = "none";
 
     alert(`${WELCOME_MESSAGE}\n\nWelcome ${currentUser.displayName}`);
   } catch (error) {
     console.error("Login error:", error);
     alert("Login failed. Try again.");
   }
-};
+}
 
-// 📝 CRIAR POST (FIRESTORE)
-window.createPost = async function () {
-  const text = document.getElementById("postInput").value.trim();
+
+// ======================
+// 📝 CRIAR POST
+// ======================
+async function createPost() {
+  const input = document.getElementById("postInput");
+  const text = input?.value?.trim();
 
   if (!text) return;
+
   if (!currentUser) {
     alert("You must be logged in to post.");
     return;
@@ -51,43 +74,55 @@ window.createPost = async function () {
 
   try {
     await addDoc(collection(db, "posts"), {
-      text: text,
+      text,
       user: currentUser.displayName,
-      photo: currentUser.photoURL,
+      photo: currentUser.photoURL || null,
+      uid: currentUser.uid,
       createdAt: serverTimestamp()
     });
 
-    document.getElementById("postInput").value = "";
+    input.value = "";
   } catch (error) {
     console.error("Error creating post:", error);
   }
-};
+}
 
-// 📡 ESCUTAR POSTS EM TEMPO REAL
+
+// ======================
+// 📡 REALTIME POSTS
+// ======================
 const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
 onSnapshot(q, (snapshot) => {
   const container = document.getElementById("posts");
+  if (!container) return;
+
   container.innerHTML = "";
 
-  // Optional: show welcome message at top of feed
+  // 🔥 Welcome message fixo no topo
   const welcomeDiv = document.createElement("div");
   welcomeDiv.className = "post";
   welcomeDiv.innerHTML = `<p><b>${WELCOME_MESSAGE}</b></p>`;
   container.appendChild(welcomeDiv);
 
-  snapshot.forEach((doc) => {
-    const post = doc.data();
+  snapshot.forEach((docSnap) => {
+    const post = docSnap.data();
 
     const div = document.createElement("div");
     div.className = "post";
 
     div.innerHTML = `
-      <p><b>${post.user}</b></p>
-      <p>${post.text}</p>
+      <p><b>${post.user || "Unknown"}</b></p>
+      <p>${post.text || ""}</p>
     `;
 
     container.appendChild(div);
   });
 });
-</script>
+
+
+// ======================
+// 🌍 EXPORT GLOBAL (SEM POLUIR WINDOW)
+// ======================
+window.loginGoogle = loginGoogle;
+window.createPost = createPost;
