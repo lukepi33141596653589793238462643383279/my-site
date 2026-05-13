@@ -15,35 +15,103 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🌐 MESSAGE GLOBAL
+
+// ======================
+// 🌐 GLOBAL MESSAGE
+// ======================
 const WELCOME_MESSAGE = "Welcome to the academic and university forum";
 
-// 🔧 CONFIG FIREBASE
-const firebaseConfig = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
-};
 
-// 🚀 INIT
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// ======================
+// 🧯 GLOBAL ERROR PROTECTION
+// ======================
+window.addEventListener("error", (e) => {
+  console.error("Global Error:", e.error);
+  showFallback("Unexpected error occurred.");
+});
 
-// 🔐 Provider único (melhor prática)
-const provider = new GoogleAuthProvider();
+window.addEventListener("unhandledrejection", (e) => {
+  console.error("Promise Error:", e.reason);
+  showFallback("Unexpected async error occurred.");
+});
 
+function showFallback(message) {
+  let fallback = document.getElementById("fallback");
+
+  if (!fallback) {
+    fallback = document.createElement("div");
+    fallback.id = "fallback";
+
+    fallback.style.position = "fixed";
+    fallback.style.top = "0";
+    fallback.style.left = "0";
+    fallback.style.width = "100%";
+    fallback.style.height = "100%";
+    fallback.style.background = "#202225";
+    fallback.style.color = "white";
+    fallback.style.display = "flex";
+    fallback.style.flexDirection = "column";
+    fallback.style.justifyContent = "center";
+    fallback.style.alignItems = "center";
+    fallback.style.zIndex = "9999";
+    fallback.style.fontFamily = "Arial";
+
+    document.body.appendChild(fallback);
+  }
+
+  fallback.innerHTML = `
+    <h2>⚠️ System Error</h2>
+    <p>${message}</p>
+    <button onclick="location.reload()"
+      style="padding:10px;background:#5865f2;color:white;border:none;border-radius:6px;cursor:pointer;">
+      Reload
+    </button>
+  `;
+}
+
+
+// ======================
+// 🔧 FIREBASE INIT SAFETY
+// ======================
+let app, auth, db, provider;
+
+try {
+  const firebaseConfig = {
+    apiKey: "COLE_AQUI",
+    authDomain: "COLE_AQUI",
+    projectId: "COLE_AQUI",
+    storageBucket: "COLE_AQUI",
+    messagingSenderId: "COLE_AQUI",
+    appId: "COLE_AQUI"
+  };
+
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  provider = new GoogleAuthProvider();
+
+} catch (err) {
+  console.error("Firebase Init Error:", err);
+  showFallback("Firebase failed to initialize.");
+}
+
+
+// ======================
+// 👤 USER STATE SAFE
+// ======================
 let currentUser = null;
 
 
 // ======================
-// 🔐 LOGIN GOOGLE
+// 🔐 LOGIN GOOGLE SAFE
 // ======================
 async function loginGoogle() {
   try {
+    if (!auth || !provider) {
+      showFallback("Auth system not ready.");
+      return;
+    }
+
     const result = await signInWithPopup(auth, provider);
     currentUser = result.user;
 
@@ -51,78 +119,92 @@ async function loginGoogle() {
     if (loginBox) loginBox.style.display = "none";
 
     alert(`${WELCOME_MESSAGE}\n\nWelcome ${currentUser.displayName}`);
+
   } catch (error) {
     console.error("Login error:", error);
-    alert("Login failed. Try again.");
+    showFallback("Login failed. Try again.");
   }
 }
 
 
 // ======================
-// 📝 CRIAR POST
+// 📝 CREATE POST SAFE
 // ======================
 async function createPost() {
-  const input = document.getElementById("postInput");
-  const text = input?.value?.trim();
-
-  if (!text) return;
-
-  if (!currentUser) {
-    alert("You must be logged in to post.");
-    return;
-  }
-
   try {
+    const input = document.getElementById("postInput");
+    const text = input?.value?.trim();
+
+    if (!text) return;
+
+    if (!currentUser) {
+      alert("You must be logged in to post.");
+      return;
+    }
+
+    if (!db) {
+      showFallback("Database not available.");
+      return;
+    }
+
     await addDoc(collection(db, "posts"), {
       text,
-      user: currentUser.displayName,
+      user: currentUser.displayName || "Unknown",
       photo: currentUser.photoURL || null,
       uid: currentUser.uid,
       createdAt: serverTimestamp()
     });
 
     input.value = "";
+
   } catch (error) {
     console.error("Error creating post:", error);
+    showFallback("Failed to send message.");
   }
 }
 
 
 // ======================
-// 📡 REALTIME POSTS
+// 📡 REALTIME POSTS SAFE
 // ======================
-const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+try {
+  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
-onSnapshot(q, (snapshot) => {
-  const container = document.getElementById("posts");
-  if (!container) return;
+  onSnapshot(q, (snapshot) => {
+    const container = document.getElementById("posts");
+    if (!container) return;
 
-  container.innerHTML = "";
+    container.innerHTML = "";
 
-  // 🔥 Welcome message fixo no topo
-  const welcomeDiv = document.createElement("div");
-  welcomeDiv.className = "post";
-  welcomeDiv.innerHTML = `<p><b>${WELCOME_MESSAGE}</b></p>`;
-  container.appendChild(welcomeDiv);
+    // welcome message
+    const welcomeDiv = document.createElement("div");
+    welcomeDiv.className = "post";
+    welcomeDiv.innerHTML = `<p><b>${WELCOME_MESSAGE}</b></p>`;
+    container.appendChild(welcomeDiv);
 
-  snapshot.forEach((docSnap) => {
-    const post = docSnap.data();
+    snapshot.forEach((docSnap) => {
+      const post = docSnap.data();
 
-    const div = document.createElement("div");
-    div.className = "post";
+      const div = document.createElement("div");
+      div.className = "post";
 
-    div.innerHTML = `
-      <p><b>${post.user || "Unknown"}</b></p>
-      <p>${post.text || ""}</p>
-    `;
+      div.innerHTML = `
+        <p><b>${post.user || "Unknown"}</b></p>
+        <p>${post.text || ""}</p>
+      `;
 
-    container.appendChild(div);
+      container.appendChild(div);
+    });
   });
-});
+
+} catch (err) {
+  console.error("Firestore listener error:", err);
+  showFallback("Failed to load messages.");
+}
 
 
 // ======================
-// 🌍 EXPORT GLOBAL (SEM POLUIR WINDOW)
+// 🌍 GLOBAL EXPORT SAFE
 // ======================
 window.loginGoogle = loginGoogle;
 window.createPost = createPost;
