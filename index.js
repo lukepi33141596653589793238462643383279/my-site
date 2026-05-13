@@ -5,7 +5,7 @@ const WELCOME_MESSAGE = "Welcome to the academic and university forum";
 
 
 // ======================
-// 🧯 SAFE FALLBACK (ANTI TELA BRANCA)
+// 🧯 SAFE FALLBACK
 // ======================
 function showFallback(message) {
   let el = document.getElementById("fallback");
@@ -59,13 +59,28 @@ window.addEventListener("unhandledrejection", (e) => {
 
 
 // ======================
-// 👤 USER STATE (LOGIN SIMPLES)
+// 🔥 IMPORT FIRESTORE (CORREÇÃO PRINCIPAL)
+// ======================
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import { db } from "./firebase.js";
+
+
+// ======================
+// 👤 USER STATE
 // ======================
 let currentUser = null;
 
 
 // ======================
-// 🔐 LOGIN (USERNAME + PASSWORD)
+// 🔐 LOGIN (SIMPLES)
 // ======================
 function login(username, password) {
   const USERS = {
@@ -106,7 +121,7 @@ function restoreUser() {
 
 
 // ======================
-// 📝 CREATE POST (FIRESTORE)
+// 📝 CREATE POST
 // ======================
 async function createPost() {
   try {
@@ -187,7 +202,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 // ======================
-// 🌍 EXPORT GLOBAL
+// 🌍 EXPORT
 // ======================
 window.login = login;
 window.createPost = createPost;
