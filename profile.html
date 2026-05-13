@@ -21,7 +21,7 @@
       background: #2f3136;
       padding: 30px;
       border-radius: 10px;
-      width: 300px;
+      width: 320px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -73,53 +73,79 @@
 
     <input id="username" placeholder="Username" />
 
-    <input id="password" type="password" placeholder="Password (6-256 chars)" />
-
     <button onclick="saveProfile()">Continue</button>
   </div>
 
   <script type="module">
     import {
-      db,
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      getFirestore,
       doc,
       setDoc
-    } from "./firebase.js";
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // pega usuário do login anterior
-    const user = JSON.parse(localStorage.getItem("user"));
+    // 🔧 CONFIG FIREBASE
+    const firebaseConfig = {
+      apiKey: "COLE_AQUI",
+      authDomain: "COLE_AQUI",
+      projectId: "COLE_AQUI",
+      storageBucket: "COLE_AQUI",
+      messagingSenderId: "COLE_AQUI",
+      appId: "COLE_AQUI"
+    };
 
-    if (!user) {
-      window.location.href = "index.html";
-    }
+    // 🚀 INIT
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    document.getElementById("userInfo").innerText =
-      "Logged in as: " + user.email;
+    let currentUser = null;
 
+    // 🔐 VERIFICA LOGIN REAL (NÃO LOCALSTORAGE)
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      currentUser = user;
+
+      document.getElementById("userInfo").innerText =
+        "Logged in as: " + user.email;
+    });
+
+
+    // 💾 SALVAR PERFIL
     window.saveProfile = async function () {
       const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value;
 
-      // validações
       if (!username) {
         alert("Username required");
         return;
       }
 
-      if (password.length < 6 || password.length > 256) {
-        alert("Password must be 6 to 256 characters");
+      if (!currentUser) {
+        alert("User not authenticated");
         return;
       }
 
       try {
-        await setDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users", currentUser.uid), {
           username: username,
-          email: user.email,
-          photo: user.photoURL,
-          password: password,
+          email: currentUser.email,
+          photo: currentUser.photoURL || null,
+          uid: currentUser.uid,
           createdAt: Date.now()
         });
 
-        // vai para o app principal
         window.location.href = "app.html";
 
       } catch (error) {
@@ -130,4 +156,5 @@
   </script>
 
 </body>
+
 </html>
