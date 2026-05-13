@@ -1,73 +1,51 @@
 // ======================
-// 🔐 AUTH MODULE (CLEAN VERSION)
+// 🔐 SIMPLE LOGIN (FAST MODE)
 // ======================
 
-import {
-  auth,
-  provider,
-  loginWithGoogle,
-  logoutUser,
-  onUserChange
-} from "./firebase.js";
-
-
-// ======================
-// 🧠 STATE
-// ======================
 let currentUser = null;
 
+// usuário fake simples (você pode mudar depois)
+const USERS = {
+  "lucas": "1234"
+};
 
 // ======================
-// 🔐 LOGIN GOOGLE
+// LOGIN
 // ======================
-export async function loginGoogle() {
-  try {
-    const user = await loginWithGoogle();
-    currentUser = user?.user || null;
+export function login(username, password) {
+  if (USERS[username] && USERS[username] === password) {
+    currentUser = {
+      uid: username,
+      displayName: username
+    };
 
-    console.log("✅ Login success:", currentUser?.displayName);
+    localStorage.setItem("user", JSON.stringify(currentUser));
 
     return currentUser;
-
-  } catch (err) {
-    console.error("❌ Login error (REAL):", err);
-    alert("Login failed: " + err.message);
-    return null;
   }
+
+  alert("Login inválido");
+  return null;
 }
 
+// ======================
+// LOGOUT
+// ======================
+export function logout() {
+  currentUser = null;
+  localStorage.removeItem("user");
+}
 
 // ======================
-// 🚪 LOGOUT
+// CHECK LOGIN
 // ======================
-export async function logout() {
-  try {
-    await logoutUser();
-    currentUser = null;
+export function getUser() {
+  if (currentUser) return currentUser;
 
-    console.log("🚪 Logged out");
-
-  } catch (err) {
-    console.error("❌ Logout error:", err);
-    alert("Logout failed: " + err.message);
+  const saved = localStorage.getItem("user");
+  if (saved) {
+    currentUser = JSON.parse(saved);
   }
-}
 
-
-// ======================
-// 👤 AUTH STATE
-// ======================
-export function initAuth(callback) {
-  onUserChange((user) => {
-    currentUser = user;
-    callback(user);
-  });
-}
-
-
-// ======================
-// 🧠 GET USER
-// ======================
-export function getCurrentUser() {
   return currentUser;
 }
