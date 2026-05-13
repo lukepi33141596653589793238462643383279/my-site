@@ -1,23 +1,3 @@
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-
 // ======================
 // 🌐 CONFIG
 // ======================
@@ -79,64 +59,54 @@ window.addEventListener("unhandledrejection", (e) => {
 
 
 // ======================
-// 🔧 FIREBASE INIT
-// ======================
-let app, auth, db, provider;
-
-try {
-  const firebaseConfig = {
-    apiKey: "COLE_AQUI",
-    authDomain: "COLE_AQUI",
-    projectId: "COLE_AQUI",
-    storageBucket: "COLE_AQUI",
-    messagingSenderId: "COLE_AQUI",
-    appId: "COLE_AQUI"
-  };
-
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-  provider = new GoogleAuthProvider();
-
-} catch (err) {
-  console.error(err);
-  showFallback("Firebase failed to initialize");
-}
-
-
-// ======================
-// 👤 USER STATE
+// 👤 USER STATE (LOGIN SIMPLES)
 // ======================
 let currentUser = null;
 
 
 // ======================
-// 🔐 LOGIN GOOGLE
+// 🔐 LOGIN (USERNAME + PASSWORD)
 // ======================
-async function loginGoogle() {
-  try {
-    if (!auth || !provider) {
-      showFallback("Auth not ready");
-      return;
-    }
+function login(username, password) {
+  const USERS = {
+    "lucas": "1234"
+  };
 
-    const result = await signInWithPopup(auth, provider);
-    currentUser = result.user;
+  if (USERS[username] && USERS[username] === password) {
+    currentUser = {
+      uid: username,
+      displayName: username
+    };
+
+    localStorage.setItem("user", JSON.stringify(currentUser));
 
     const loginBox = document.getElementById("loginBox");
     if (loginBox) loginBox.style.display = "none";
 
     console.log("Logged:", currentUser.displayName);
 
-  } catch (err) {
-    console.error(err);
-    showFallback("Login failed");
+    return currentUser;
+  }
+
+  showFallback("Invalid login");
+  return null;
+}
+
+
+// ======================
+// 🔄 RESTORE SESSION
+// ======================
+function restoreUser() {
+  const saved = localStorage.getItem("user");
+
+  if (saved) {
+    currentUser = JSON.parse(saved);
   }
 }
 
 
 // ======================
-// 📝 CREATE POST
+// 📝 CREATE POST (FIRESTORE)
 // ======================
 async function createPost() {
   try {
@@ -151,15 +121,9 @@ async function createPost() {
       return;
     }
 
-    if (!db) {
-      showFallback("Database not ready");
-      return;
-    }
-
     await addDoc(collection(db, "posts"), {
       text,
       user: currentUser.displayName || "Unknown",
-      photo: currentUser.photoURL || null,
       uid: currentUser.uid,
       createdAt: serverTimestamp()
     });
@@ -214,15 +178,16 @@ function initChat() {
 
 
 // ======================
-// 🚀 INIT APP SAFELY
+// 🚀 INIT APP
 // ======================
 window.addEventListener("DOMContentLoaded", () => {
-  if (db) initChat();
+  restoreUser();
+  initChat();
 });
 
 
 // ======================
-// 🌍 EXPORT FUNCTIONS
+// 🌍 EXPORT GLOBAL
 // ======================
-window.loginGoogle = loginGoogle;
+window.login = login;
 window.createPost = createPost;
