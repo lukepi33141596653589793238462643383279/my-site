@@ -15,33 +15,28 @@ import {
   getFirestore,
   collection,
   addDoc,
-  getDocs,
   onSnapshot,
-  doc,
-  setDoc,
-  getDoc,
   query,
   orderBy,
-  serverTimestamp,
-  where
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 // =========================
-// 🔧 CONFIGURAÇÃO FIREBASE
+// 🔧 CONFIGURAÇÃO FIREBASE (OBRIGATÓRIO)
 // =========================
 const firebaseConfig = {
-  apiKey: "COLE_AQUI",
-  authDomain: "COLE_AQUI",
-  projectId: "COLE_AQUI",
-  storageBucket: "COLE_AQUI",
-  messagingSenderId: "COLE_AQUI",
-  appId: "COLE_AQUI"
+  apiKey: "SEU_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_PROJECT_ID.appspot.com",
+  messagingSenderId: "SEU_ID",
+  appId: "SEU_APP_ID"
 };
 
 
 // =========================
-// 🚀 INIT
+// 🚀 INIT (EVITA DUPLICAÇÃO)
 // =========================
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -50,18 +45,25 @@ const provider = new GoogleAuthProvider();
 
 
 // =========================
-// 🔐 AUTH HELPERS (EVITA ERRO NO APP)
+// 🔐 AUTH SAFE (COM ERRO REAL)
 // =========================
-const loginWithGoogle = () => signInWithPopup(auth, provider);
+const loginWithGoogle = async () => {
+  try {
+    return await signInWithPopup(auth, provider);
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    alert("Login failed: " + error.message);
+  }
+};
+
 const logoutUser = () => signOut(auth);
+
 const onUserChange = (callback) => onAuthStateChanged(auth, callback);
 
 
 // =========================
 // 💬 FIRESTORE HELPERS
 // =========================
-
-// Enviar mensagem segura
 const sendMessage = async (text, user) => {
   if (!user || !text) return;
 
@@ -74,49 +76,30 @@ const sendMessage = async (text, user) => {
   });
 };
 
-// Escutar mensagens em tempo real
 const listenMessages = (callback) => {
   const q = query(collection(db, "messages"), orderBy("createdAt"));
 
   return onSnapshot(q, (snapshot) => {
-    const messages = snapshot.docs.map(doc => ({
+    callback(snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }));
-
-    callback(messages);
+    })));
   });
 };
 
 
 // =========================
-// 🌐 EXPORT ÚNICO (MAIS LIMPO)
+// 🌐 EXPORT
 // =========================
 export {
-  // core
   auth,
   db,
   provider,
 
-  // auth
   loginWithGoogle,
   logoutUser,
   onUserChange,
 
-  // firestore raw (caso precise)
-  collection,
-  addDoc,
-  getDocs,
-  onSnapshot,
-  doc,
-  setDoc,
-  getDoc,
-  query,
-  orderBy,
-  serverTimestamp,
-  where,
-
-  // helpers prontos (IMPORTANTE PRO SEU CHAT)
   sendMessage,
   listenMessages
 };
