@@ -84,6 +84,7 @@
       cursor: pointer;
     }
 
+    /* LOGIN */
     #loginBox {
       position: fixed;
       top: 0;
@@ -96,6 +97,13 @@
       align-items: center;
       flex-direction: column;
       gap: 10px;
+    }
+
+    #loginBox input {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      width: 200px;
     }
 
     #loginBox button {
@@ -116,10 +124,14 @@
     University Chat for Software Engineering
   </header>
 
-  <!-- LOGIN SCREEN -->
+  <!-- LOGIN SCREEN (SIMPLES) -->
   <div id="loginBox">
     <h2>Login</h2>
-    <button onclick="loginGoogle()">Login with Google</button>
+
+    <input id="username" placeholder="username" />
+    <input id="password" type="password" placeholder="password" />
+
+    <button onclick="doLogin()">Login</button>
   </div>
 
   <!-- APP -->
@@ -146,8 +158,24 @@
 
   </div>
 
-  <!-- 🔥 SEU JS PRINCIPAL -->
+  <!-- JS -->
   <script type="module" src="./index.js"></script>
+
+  <!-- LOGIN BRIDGE -->
+  <script type="module">
+    import { login } from "./auth.js";
+
+    window.doLogin = function () {
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+
+      const user = login(u, p);
+
+      if (user) {
+        location.reload();
+      }
+    };
+  </script>
 
 </body>
 
