@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucas Forum</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
+    }
+
+    header {
+      background: #161b22;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #30363d;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .post-box {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      resize: none;
+      background: #0d1117;
+      color: white;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #238636;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2ea043;
+    }
+
+    .post {
+      background: #161b22;
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .comment-box {
+      margin-top: 15px;
+    }
+
+    .comment-box input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: #0d1117;
+      color: white;
+      box-sizing: border-box;
+    }
+
+    .comment {
+      background: #0d1117;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Lucas Forum</h1>
+  <p>Technology • Linux • AI • Mathematics</p>
+</header>
+
+<div class="container">
+
+  <div class="post-box">
+    <textarea id="postInput" placeholder="Escreva uma publicação..."></textarea>
+    <button onclick="createPost()">Publicar</button>
+  </div>
+
+  <div id="posts"></div>
+
+</div>
+
+<script>
+
+function createPost() {
+  const input = document.getElementById('postInput');
+  const text = input.value.trim();
+
+  if(text === '') {
+    return;
+  }
+
+  const post = document.createElement('div');
+  post.className = 'post';
+
+  post.innerHTML = `
+    <p>${text}</p>
+
+    <div class="actions">
+      <button onclick="likePost(this)">Curtir</button>
+      <button onclick="sharePost()">Compartilhar</button>
+    </div>
+
+    <div class="comment-box">
+      <input type="text" placeholder="Escreva um comentário..." onkeydown="addComment(event, this)">
+      <div class="comments"></div>
+    </div>
+  `;
+
+  document.getElementById('posts').prepend(post);
+
+  input.value = '';
+}
+
+function likePost(button) {
+  let likes = button.getAttribute('data-likes') || 0;
+  likes++;
+  button.setAttribute('data-likes', likes);
+  button.innerText = `Curtir (${likes})`;
+}
+
+function sharePost() {
+  alert('Compartilhe copiando o link do site!');
+}
+
+function addComment(event, input) {
+  if(event.key === 'Enter') {
+    const text = input.value.trim();
+
+    if(text === '') {
+      return;
+    }
+
+    const comment = document.createElement('div');
+    comment.className = 'comment';
+    comment.innerText = text;
+
+    input.parentElement.querySelector('.comments').appendChild(comment);
+
+    input.value = '';
+  }
+}
+
+</script>
+
+</body>
+</html>
