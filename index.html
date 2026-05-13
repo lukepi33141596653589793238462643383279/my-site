@@ -4,21 +4,151 @@
 <head>
   <meta charset="UTF-8" />
   <title>University Chat</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #36393f;
+      color: white;
+    }
+
+    header {
+      background: #2f3136;
+      padding: 12px;
+      font-weight: bold;
+    }
+
+    #appContainer {
+      display: flex;
+      height: calc(100vh - 50px);
+    }
+
+    #sidebar {
+      width: 80px;
+      background: #202225;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+      gap: 10px;
+    }
+
+    .serverBtn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      background: #5865f2;
+      color: white;
+      cursor: pointer;
+    }
+
+    #chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #posts {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #inputArea {
+      display: flex;
+      padding: 10px;
+      background: #2f3136;
+    }
+
+    #postInput {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #40444b;
+      color: white;
+    }
+
+    button.send {
+      margin-left: 10px;
+      background: #5865f2;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #loginBox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #202225;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #loginBox button {
+      padding: 12px 20px;
+      border: none;
+      background: #5865f2;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-  <h2>University Chat</h2>
+  <!-- HEADER -->
+  <header>
+    University Chat for Software Engineering
+  </header>
 
-  <div id="posts"></div>
+  <!-- LOGIN SCREEN -->
+  <div id="loginBox">
+    <h2>Login</h2>
+    <button onclick="loginGoogle()">Login with Google</button>
+  </div>
 
-  <input id="postInput" placeholder="Write..." />
-  <button onclick="createPost()">Send</button>
+  <!-- APP -->
+  <div id="appContainer">
 
-  <button onclick="loginGoogle()">Login</button>
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <button class="serverBtn">G</button>
+      <button class="serverBtn">AI</button>
+      <button class="serverBtn">S</button>
+    </div>
 
-  <!-- 🔥 ISSO AQUI É O PONTO CRÍTICO -->
+    <!-- CHAT -->
+    <div id="chat">
+
+      <div id="posts"></div>
+
+      <div id="inputArea">
+        <input id="postInput" placeholder="Write a message..." />
+        <button class="send" onclick="createPost()">Send</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 🔥 SEU JS PRINCIPAL -->
   <script type="module" src="./index.js"></script>
 
 </body>
+
 </html>
