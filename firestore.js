@@ -1,13 +1,9 @@
-
 // ======================
-// 🧠 FIRESTORE MODULE (BOOTSTRAP BASED)
+// 💬 FIRESTORE MODULE (CLEAN VERSION)
 // ======================
 
 import {
-  dbInstance
-} from "./bootstrap.js";
-
-import {
+  getFirestore,
   collection,
   addDoc,
   onSnapshot,
@@ -16,9 +12,11 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import { db } from "./firebase.js";
+
 
 // ======================
-// 🧯 FALLBACK (ANTI TELA BRANCA)
+// 🧯 FALLBACK (ANTI CRASH)
 // ======================
 function firestoreFallback(message) {
   let el = document.getElementById("firestore-fallback");
@@ -27,19 +25,21 @@ function firestoreFallback(message) {
     el = document.createElement("div");
     el.id = "firestore-fallback";
 
-    el.style.position = "fixed";
-    el.style.top = "0";
-    el.style.left = "0";
-    el.style.width = "100%";
-    el.style.height = "100%";
-    el.style.background = "#202225";
-    el.style.color = "white";
-    el.style.display = "flex";
-    el.style.flexDirection = "column";
-    el.style.justifyContent = "center";
-    el.style.alignItems = "center";
-    el.style.zIndex = "99999";
-    el.style.fontFamily = "Arial";
+    el.style.cssText = `
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#202225;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      z-index:99999;
+      font-family:Arial;
+    `;
 
     document.body.appendChild(el);
   }
@@ -56,21 +56,20 @@ function firestoreFallback(message) {
 
 
 // ======================
-// 💬 CREATE POST / MESSAGE
+// 💬 CREATE POST
 // ======================
 export async function createPost(text, user) {
   try {
-    if (!dbInstance) {
+    if (!db) {
       firestoreFallback("Database not initialized");
       return;
     }
 
     if (!text || !user) return;
 
-    await addDoc(collection(dbInstance, "posts"), {
+    await addDoc(collection(db, "posts"), {
       text,
-      user: user.displayName || "Unknown",
-      photo: user.photoURL || null,
+      user: user.displayName,
       uid: user.uid,
       createdAt: serverTimestamp()
     });
@@ -87,23 +86,23 @@ export async function createPost(text, user) {
 // ======================
 export function listenPosts(callback) {
   try {
-    if (!dbInstance) {
+    if (!db) {
       firestoreFallback("Database not ready");
       return;
     }
 
     const q = query(
-      collection(dbInstance, "posts"),
+      collection(db, "posts"),
       orderBy("createdAt", "desc")
     );
 
     return onSnapshot(q, (snapshot) => {
-      const posts = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      callback(posts);
+      callback(
+        snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+      );
     });
 
   } catch (err) {
@@ -114,28 +113,33 @@ export function listenPosts(callback) {
 
 
 // ======================
-// 🧠 SAFE READ (FUTURO EXPANSÃO)
+// 🧠 GET POSTS ONCE (OPTIONAL)
 // ======================
 export async function getPostsOnce() {
   try {
-    if (!dbInstance) {
+    if (!db) {
       firestoreFallback("Database not ready");
       return [];
     }
 
-    const q = query(
-      collection(dbInstance, "posts"),
-      orderBy("createdAt", "desc")
-    );
+    return await new Promise((resolve, reject) => {
+      const q = query(
+        collection(db, "posts"),
+        orderBy("createdAt", "desc")
+      );
 
-    const snapshot = await new Promise((resolve, reject) => {
-      onSnapshot(q, resolve, reject);
+      const unsub = onSnapshot(
+        q,
+        (snapshot) => {
+          unsub();
+          resolve(snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })));
+        },
+        reject
+      );
     });
-
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
 
   } catch (err) {
     console.error("Get posts error:", err);
