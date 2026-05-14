@@ -1,0 +1,356 @@
+/* =========================================================
+   🌌 UNIVERSITY CHAT — VARIABLES SYSTEM
+   FILE: styles/core/variables.css
+   ARCHITECTURE: Modular UI System
+   THEME: Cyber Blue / Neon Dark
+========================================================= */
+
+/* =========================================================
+   🎯 ROOT VARIABLES
+========================================================= */
+
+:root {
+
+  /* =====================================================
+     📏 BORDER RADIUS
+  ===================================================== */
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+  --radius-full: 999px;
+
+  /* =====================================================
+     📦 SPACING SYSTEM
+  ===================================================== */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+
+  /* =====================================================
+     🔠 FONT SYSTEM
+  ===================================================== */
+
+  --font-primary:
+    "Inter",
+    "Segoe UI",
+    sans-serif;
+
+  --font-secondary:
+    "Poppins",
+    sans-serif;
+
+  --font-code:
+    "JetBrains Mono",
+    monospace;
+
+  /* =====================================================
+     🔡 FONT SIZES
+  ===================================================== */
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+
+  /* =====================================================
+     ⚖️ FONT WEIGHTS
+  ===================================================== */
+
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* =====================================================
+     📐 LAYOUT WIDTHS
+  ===================================================== */
+
+  --sidebar-width: 78px;
+  --channels-width: 280px;
+  --profile-panel-width: 340px;
+
+  --topbar-height: 64px;
+  --input-height: 48px;
+
+  /* =====================================================
+     🪟 Z-INDEX SYSTEM
+  ===================================================== */
+
+  --z-background: -1;
+  --z-normal: 1;
+  --z-dropdown: 100;
+  --z-sidebar: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  /* =====================================================
+     ⚡ TRANSITIONS
+  ===================================================== */
+
+  --transition-fast:
+    0.15s ease;
+
+  --transition-normal:
+    0.25s ease;
+
+  --transition-slow:
+    0.4s ease;
+
+  --transition-glow:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+
+  /* =====================================================
+     🌫️ BLUR EFFECTS
+  ===================================================== */
+
+  --blur-sm: blur(4px);
+  --blur-md: blur(10px);
+  --blur-lg: blur(20px);
+  --blur-xl: blur(30px);
+
+  /* =====================================================
+     📦 SHADOW SYSTEM
+  ===================================================== */
+
+  --shadow-xs:
+    0 1px 2px rgba(0,0,0,0.15);
+
+  --shadow-sm:
+    0 2px 4px rgba(0,0,0,0.18);
+
+  --shadow-md:
+    0 6px 12px rgba(0,0,0,0.24);
+
+  --shadow-lg:
+    0 12px 24px rgba(0,0,0,0.32);
+
+  --shadow-xl:
+    0 20px 40px rgba(0,0,0,0.45);
+
+  /* =====================================================
+     💡 GLOW EFFECTS
+  ===================================================== */
+
+  --glow-sm:
+    0 0 5px rgba(59,130,246,0.35);
+
+  --glow-md:
+    0 0 10px rgba(59,130,246,0.45);
+
+  --glow-lg:
+    0 0 20px rgba(59,130,246,0.55);
+
+  --glow-xl:
+    0 0 40px rgba(59,130,246,0.65);
+
+  /* =====================================================
+     🧊 GLASSMORPHISM
+  ===================================================== */
+
+  --glass-opacity-light: 0.04;
+  --glass-opacity-medium: 0.08;
+  --glass-opacity-strong: 0.14;
+
+  --glass-border-light:
+    rgba(255,255,255,0.05);
+
+  --glass-border-medium:
+    rgba(255,255,255,0.08);
+
+  --glass-border-strong:
+    rgba(255,255,255,0.14);
+
+  /* =====================================================
+     🎞️ ANIMATIONS
+  ===================================================== */
+
+  --animation-fast: 120ms;
+  --animation-normal: 250ms;
+  --animation-slow: 450ms;
+
+  /* =====================================================
+     📱 RESPONSIVE BREAKPOINTS
+  ===================================================== */
+
+  --mobile-sm: 480px;
+  --mobile-md: 768px;
+  --tablet: 1024px;
+  --desktop: 1280px;
+  --desktop-lg: 1536px;
+
+  /* =====================================================
+     📡 SCROLLBAR SYSTEM
+  ===================================================== */
+
+  --scrollbar-width: 8px;
+
+  --scrollbar-radius: 999px;
+
+  /* =====================================================
+     🧠 PROFILE VARIABLES
+  ===================================================== */
+
+  --profile-avatar-sm: 32px;
+  --profile-avatar-md: 48px;
+  --profile-avatar-lg: 72px;
+  --profile-avatar-xl: 120px;
+
+  --profile-banner-height: 180px;
+
+  /* =====================================================
+     💬 MESSAGE VARIABLES
+  ===================================================== */
+
+  --message-spacing: 18px;
+
+  --message-padding:
+    10px 14px;
+
+  --message-radius:
+    14px;
+
+  /* =====================================================
+     🖥️ APP CONTAINER
+  ===================================================== */
+
+  --app-max-width: 1920px;
+
+  --app-padding:
+    16px;
+
+  /* =====================================================
+     📁 FILE PREVIEW SYSTEM
+  ===================================================== */
+
+  --file-preview-width: 320px;
+  --file-preview-height: 180px;
+
+  /* =====================================================
+     🔘 BUTTON VARIABLES
+  ===================================================== */
+
+  --button-height-sm: 34px;
+  --button-height-md: 42px;
+  --button-height-lg: 52px;
+
+  --button-padding:
+    0 18px;
+
+  /* =====================================================
+     📋 MODAL VARIABLES
+  ===================================================== */
+
+  --modal-width-sm: 420px;
+  --modal-width-md: 680px;
+  --modal-width-lg: 920px;
+
+  /* =====================================================
+     🌌 BACKGROUND EFFECTS
+  ===================================================== */
+
+  --background-grid-opacity: 0.03;
+
+  --background-noise-opacity: 0.015;
+
+  /* =====================================================
+     🦌 HART SACCULL VARIABLES
+  ===================================================== */
+
+  --hart-size-sm: 60px;
+  --hart-size-md: 120px;
+  --hart-size-lg: 220px;
+
+  --hart-float-distance: 12px;
+
+  --hart-animation-speed: 4s;
+
+  /* =====================================================
+     📊 FEED SYSTEM
+  ===================================================== */
+
+  --feed-max-width: 820px;
+
+  --feed-gap: 20px;
+
+  /* =====================================================
+     🎯 CURSOR SYSTEM
+  ===================================================== */
+
+  --cursor-pointer: pointer;
+  --cursor-disabled: not-allowed;
+
+}
+
+/* =========================================================
+   🌙 DARK MODE VARIABLES
+========================================================= */
+
+.dark-mode {
+
+  --glass-opacity-light: 0.06;
+  --glass-opacity-medium: 0.10;
+  --glass-opacity-strong: 0.16;
+
+}
+
+/* =========================================================
+   ⚡ CYBER MODE VARIABLES
+========================================================= */
+
+.cyber-mode {
+
+  --glow-sm:
+    0 0 8px rgba(0,255,255,0.4);
+
+  --glow-md:
+    0 0 14px rgba(0,255,255,0.5);
+
+  --glow-lg:
+    0 0 28px rgba(0,255,255,0.6);
+
+  --glow-xl:
+    0 0 42px rgba(0,255,255,0.8);
+
+}
+
+/* =========================================================
+   📱 MOBILE VARIABLES
+========================================================= */
+
+@media (max-width: 768px) {
+
+  :root {
+
+    --channels-width: 100%;
+    --profile-panel-width: 100%;
+
+    --topbar-height: 58px;
+
+    --space-10: 32px;
+
+    --text-4xl: 2rem;
+
+  }
+
+}
