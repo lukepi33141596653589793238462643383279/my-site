@@ -1,0 +1,415 @@
+/* =========================================================
+   🌌 UNIVERSITY CHAT — GRADIENT SYSTEM
+   FILE: styles/themes/gradients.css
+   THEME: Cyber Blue / Neon Dark / Glass UI
+========================================================= */
+
+/* =========================================================
+   🎨 ROOT GRADIENT VARIABLES
+========================================================= */
+
+:root {
+
+  /* =====================================================
+     🔵 PRIMARY BLUE GRADIENTS
+  ===================================================== */
+
+  --gradient-blue-soft:
+    linear-gradient(
+      135deg,
+      #1e3a8a 0%,
+      #2563eb 50%,
+      #3b82f6 100%
+    );
+
+  --gradient-blue-dark:
+    linear-gradient(
+      135deg,
+      #020617 0%,
+      #0f172a 35%,
+      #1e293b 100%
+    );
+
+  --gradient-blue-light:
+    linear-gradient(
+      135deg,
+      #60a5fa 0%,
+      #3b82f6 50%,
+      #2563eb 100%
+    );
+
+  /* =====================================================
+     ⚡ CYBER GRADIENTS
+  ===================================================== */
+
+  --gradient-cyber-primary:
+    linear-gradient(
+      135deg,
+      #020617 0%,
+      #111827 35%,
+      #1d4ed8 100%
+    );
+
+  --gradient-cyber-secondary:
+    linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e40af 50%,
+      #3b82f6 100%
+    );
+
+  --gradient-cyber-neon:
+    linear-gradient(
+      135deg,
+      #00ffff 0%,
+      #3b82f6 50%,
+      #8b5cf6 100%
+    );
+
+  /* =====================================================
+     🌑 DARK SYSTEM GRADIENTS
+  ===================================================== */
+
+  --gradient-dark-primary:
+    linear-gradient(
+      180deg,
+      #020617 0%,
+      #0f172a 100%
+    );
+
+  --gradient-dark-secondary:
+    linear-gradient(
+      135deg,
+      #111827 0%,
+      #1f2937 100%
+    );
+
+  --gradient-dark-glass:
+    linear-gradient(
+      135deg,
+      rgba(15,23,42,0.95) 0%,
+      rgba(30,41,59,0.88) 100%
+    );
+
+  /* =====================================================
+     ✨ GLASSMORPHISM GRADIENTS
+  ===================================================== */
+
+  --gradient-glass-light:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,0.08) 0%,
+      rgba(255,255,255,0.02) 100%
+    );
+
+  --gradient-glass-dark:
+    linear-gradient(
+      135deg,
+      rgba(15,23,42,0.92) 0%,
+      rgba(2,6,23,0.85) 100%
+    );
+
+  --gradient-glass-neon:
+    linear-gradient(
+      135deg,
+      rgba(59,130,246,0.15) 0%,
+      rgba(139,92,246,0.08) 100%
+    );
+
+  /* =====================================================
+     💬 MESSAGE GRADIENTS
+  ===================================================== */
+
+  --gradient-message-self:
+    linear-gradient(
+      135deg,
+      #2563eb 0%,
+      #1d4ed8 100%
+    );
+
+  --gradient-message-other:
+    linear-gradient(
+      135deg,
+      #111827 0%,
+      #1e293b 100%
+    );
+
+  /* =====================================================
+     🧠 PROFILE GRADIENTS
+  ===================================================== */
+
+  --gradient-profile-banner:
+    linear-gradient(
+      135deg,
+      #020617 0%,
+      #1e293b 45%,
+      #2563eb 100%
+    );
+
+  --gradient-profile-card:
+    linear-gradient(
+      180deg,
+      rgba(15,23,42,0.96) 0%,
+      rgba(30,41,59,0.92) 100%
+    );
+
+  --gradient-profile-neon:
+    linear-gradient(
+      135deg,
+      #00bfff 0%,
+      #3b82f6 50%,
+      #8b5cf6 100%
+    );
+
+  /* =====================================================
+     🔘 BUTTON GRADIENTS
+  ===================================================== */
+
+  --gradient-button-primary:
+    linear-gradient(
+      135deg,
+      #2563eb 0%,
+      #3b82f6 100%
+    );
+
+  --gradient-button-hover:
+    linear-gradient(
+      135deg,
+      #3b82f6 0%,
+      #60a5fa 100%
+    );
+
+  --gradient-button-danger:
+    linear-gradient(
+      135deg,
+      #dc2626 0%,
+      #ef4444 100%
+    );
+
+  --gradient-button-success:
+    linear-gradient(
+      135deg,
+      #16a34a 0%,
+      #22c55e 100%
+    );
+
+  /* =====================================================
+     📢 NOTIFICATION GRADIENTS
+  ===================================================== */
+
+  --gradient-success:
+    linear-gradient(
+      135deg,
+      #166534 0%,
+      #22c55e 100%
+    );
+
+  --gradient-warning:
+    linear-gradient(
+      135deg,
+      #92400e 0%,
+      #f59e0b 100%
+    );
+
+  --gradient-danger:
+    linear-gradient(
+      135deg,
+      #7f1d1d 0%,
+      #ef4444 100%
+    );
+
+  --gradient-info:
+    linear-gradient(
+      135deg,
+      #1e3a8a 0%,
+      #3b82f6 100%
+    );
+
+  /* =====================================================
+     🌌 BACKGROUND GRADIENTS
+  ===================================================== */
+
+  --gradient-background-main:
+    radial-gradient(
+      circle at top left,
+      rgba(59,130,246,0.10),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(139,92,246,0.08),
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      #020617 0%,
+      #0f172a 100%
+    );
+
+  --gradient-background-sidebar:
+    linear-gradient(
+      180deg,
+      #020617 0%,
+      #0b1120 50%,
+      #111827 100%
+    );
+
+  --gradient-background-chat:
+    linear-gradient(
+      180deg,
+      #0f172a 0%,
+      #111827 100%
+    );
+
+  /* =====================================================
+     ⚡ NEON BORDER GRADIENTS
+  ===================================================== */
+
+  --gradient-border-blue:
+    linear-gradient(
+      180deg,
+      rgba(59,130,246,0.9),
+      rgba(59,130,246,0.1)
+    );
+
+  --gradient-border-neon:
+    linear-gradient(
+      180deg,
+      rgba(0,255,255,0.9),
+      rgba(139,92,246,0.2)
+    );
+
+  /* =====================================================
+     🦌 HART SACCULL GRADIENTS
+  ===================================================== */
+
+  --gradient-hart-primary:
+    linear-gradient(
+      135deg,
+      #0f172a 0%,
+      #1e40af 50%,
+      #60a5fa 100%
+    );
+
+  --gradient-hart-glow:
+    radial-gradient(
+      circle,
+      rgba(59,130,246,0.35) 0%,
+      rgba(59,130,246,0.05) 70%,
+      transparent 100%
+    );
+
+  /* =====================================================
+     📡 SERVER ICON GRADIENTS
+  ===================================================== */
+
+  --gradient-server-active:
+    linear-gradient(
+      135deg,
+      #2563eb 0%,
+      #60a5fa 100%
+    );
+
+  --gradient-server-hover:
+    linear-gradient(
+      135deg,
+      #1d4ed8 0%,
+      #3b82f6 100%
+    );
+
+  /* =====================================================
+     🌈 SPECIAL EFFECT GRADIENTS
+  ===================================================== */
+
+  --gradient-rainbow-neon:
+    linear-gradient(
+      90deg,
+      #00ffff,
+      #3b82f6,
+      #8b5cf6,
+      #ec4899,
+      #00ffff
+    );
+
+  --gradient-loading:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.02) 0%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.02) 100%
+    );
+
+}
+
+/* =========================================================
+   🌙 DARK MODE
+========================================================= */
+
+.dark-mode {
+
+  --gradient-background-main:
+    radial-gradient(
+      circle at top left,
+      rgba(37,99,235,0.12),
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      #000000 0%,
+      #020617 100%
+    );
+
+}
+
+/* =========================================================
+   ⚡ CYBER MODE
+========================================================= */
+
+.cyber-mode {
+
+  --gradient-cyber-primary:
+    linear-gradient(
+      135deg,
+      #000000 0%,
+      #001f3f 40%,
+      #00ffff 100%
+    );
+
+  --gradient-cyber-neon:
+    linear-gradient(
+      135deg,
+      #00ffff 0%,
+      #3b82f6 50%,
+      #00ffff 100%
+    );
+
+}
+
+/* =========================================================
+   🎞️ ANIMATED GRADIENTS
+========================================================= */
+
+@keyframes gradientMove {
+
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+
+}
+
+.gradient-animated {
+
+  background-size: 300% 300%;
+
+  animation:
+    gradientMove 8s ease infinite;
+
+}
