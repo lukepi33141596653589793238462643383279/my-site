@@ -1,5 +1,5 @@
 // =========================
-// 🔥 FIREBASE CORE (SÓ FIRESTORE)
+// 🔥 FIREBASE CORE (FIRESTORE ONLY)
 // =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -15,7 +15,7 @@ import {
 
 
 // =========================
-// 🔧 FIREBASE CONFIG
+// 🔧 CONFIG FIREBASE
 // =========================
 const firebaseConfig = {
   apiKey: "COLE_SUA_API_KEY_REAL_AQUI",
@@ -35,40 +35,63 @@ const db = getFirestore(app);
 
 
 // =========================
-// 💬 SEND POST (USA USER LOCAL)
+// 💬 CREATE POST (GLOBAL / ROOM SUPPORTED)
 // =========================
-const createPost = async (text, user) => {
-  if (!user || !text) return;
+const createPost = async (text, user, room = "global") => {
+  try {
+    if (!text || !user) return;
 
-  return await addDoc(collection(db, "posts"), {
-    text,
-    user: user.displayName,
-    uid: user.uid,
-    createdAt: serverTimestamp()
-  });
+    await addDoc(collection(db, "rooms", room, "messages"), {
+      text: text,
+      user: user.displayName || "anonymous",
+      uid: user.uid || null,
+      room: room,
+      createdAt: serverTimestamp()
+    });
+
+  } catch (error) {
+    console.error("❌ Erro ao enviar mensagem:", error);
+  }
 };
 
 
 // =========================
-// 📡 LISTEN POSTS
+// 📡 LISTEN POSTS (REAL TIME)
 // =========================
-const listenPosts = (callback) => {
-  const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+const listenPosts = (callback, room = "global") => {
+  try {
+    const q = query(
+      collection(db, "rooms", room, "messages"),
+      orderBy("createdAt", "desc")
+    );
 
-  return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })));
-  });
+    return onSnapshot(q, (snapshot) => {
+      const messages = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      callback(messages);
+    });
+
+  } catch (error) {
+    console.error("❌ Erro ao escutar mensagens:", error);
+  }
 };
 
 
 // =========================
-// 🌐 EXPORT (LIMPO)
+// 🧠 HELPERS (FUTURO EXPANSÃO)
+// =========================
+const setRoom = (room) => room || "global";
+
+
+// =========================
+// 🌐 EXPORTS
 // =========================
 export {
   db,
   createPost,
-  listenPosts
+  listenPosts,
+  setRoom
 };
