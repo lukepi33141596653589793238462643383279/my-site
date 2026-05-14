@@ -1,0 +1,335 @@
+// ===============================
+// 🚫 BLOCK SYSTEM - FIREBASE MODULE
+// db/block.db.js
+// ===============================
+
+// This module handles:
+// - Block / Unblock users
+// - Block status checks
+// - Blocked lists
+// - Real-time listeners
+// - Feed filtering support
+// - Safe Firestore batch writes
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  deleteDoc,
+  getDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  writeBatch,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ===============================
+// 🔥 INIT
+// ===============================
+const db = getFirestore();
+
+// ===============================
+// 📌 COLLECTION STRUCTURE
+// ===============================
+// blocks/{blockerId_blockedId}
+// blocked/{userId}/list/{blockedUserId}
+// blockers/{userId}/list/{blockerUserId}
+
+// ===============================
+// 🧠 CACHE LAYER
+// ===============================
+const blockCache = {
+  status: new Map(),      // key: blocker_blocked => true/false
+  blocked: new Map(),     // userId => [blockedIds]
+  blockers: new Map()     // userId => [blockerIds]
+};
+
+// ===============================
+// 🧩 UTIL
+// ===============================
+function blockKey(a, b) {
+  return `${a}_${b}`;
+}
+
+function isValidId(id) {
+  return typeof id === "string" && id.length > 0;
+}
+
+function now() {
+  return serverTimestamp();
+}
+
+// ===============================
+// 🚫 BLOCK USER
+// ===============================
+export async function blockUser(blockerId, blockedId) {
+  if (!isValidId(blockerId) || !isValidId(blockedId)) {
+    throw new Error("Invalid user IDs");
+  }
+
+  if (blockerId === blockedId) {
+    throw new Error("Cannot block yourself");
+  }
+
+  const key = blockKey(blockerId, blockedId);
+
+  try {
+    const batch = writeBatch(db);
+
+    const blockRef = doc(db, "blocks", key);
+    const blockedListRef = doc(db, "blocked", blockerId, "list", blockedId);
+    const blockersListRef = doc(db, "blockers", blockedId, "list", blockerId);
+
+    // main block relation
+    batch.set(blockRef, {
+      blockerId,
+      blockedId,
+      createdAt: now()
+    });
+
+    // user who blocks someone
+    batch.set(blockedListRef, {
+      userId: blockedId,
+      createdAt: now()
+    });
+
+    // user who is blocked
+    batch.set(blockersListRef, {
+      userId: blockerId,
+      createdAt: now()
+    });
+
+    await batch.commit();
+
+    blockCache.status.set(key, true);
+
+    return {
+      success: true,
+      message: "User blocked successfully"
+    };
+
+  } catch (err) {
+    console.error("blockUser error:", err);
+    throw err;
+  }
+}
+
+// ===============================
+// 🚫 UNBLOCK USER
+// ===============================
+export async function unblockUser(blockerId, blockedId) {
+  if (!isValidId(blockerId) || !isValidId(blockedId)) {
+    throw new Error("Invalid user IDs");
+  }
+
+  const key = blockKey(blockerId, blockedId);
+
+  try {
+    const batch = writeBatch(db);
+
+    const blockRef = doc(db, "blocks", key);
+    const blockedListRef = doc(db, "blocked", blockerId, "list", blockedId);
+    const blockersListRef = doc(db, "blockers", blockedId, "list", blockerId);
+
+    batch.delete(blockRef);
+    batch.delete(blockedListRef);
+    batch.delete(blockersListRef);
+
+    await batch.commit();
+
+    blockCache.status.set(key, false);
+
+    return {
+      success: true,
+      message: "User unblocked successfully"
+    };
+
+  } catch (err) {
+    console.error("unblockUser error:", err);
+    throw err;
+  }
+}
+
+// ===============================
+// 🔍 CHECK BLOCK STATUS
+// ===============================
+export async function isBlocked(blockerId, blockedId) {
+  const key = blockKey(blockerId, blockedId);
+
+  if (blockCache.status.has(key)) {
+    return blockCache.status.get(key);
+  }
+
+  try {
+    const ref = doc(db, "blocks", key);
+    const snap = await getDoc(ref);
+
+    const exists = snap.exists();
+    blockCache.status.set(key, exists);
+
+    return exists;
+
+  } catch (err) {
+    console.error("isBlocked error:", err);
+    return false;
+  }
+}
+
+// ===============================
+// 📥 GET BLOCKED USERS
+// ===============================
+export async function getBlockedUsers(userId) {
+  if (!isValidId(userId)) return [];
+
+  try {
+    const col = collection(db, "blocked", userId, "list");
+    const snap = await getDocs(col);
+
+    const result = [];
+
+    snap.forEach(doc => {
+      result.push(doc.id);
+    });
+
+    blockCache.blocked.set(userId, result);
+
+    return result;
+
+  } catch (err) {
+    console.error("getBlockedUsers error:", err);
+    return [];
+  }
+}
+
+// ===============================
+// 📥 GET BLOCKERS
+// ===============================
+export async function getBlockers(userId) {
+  if (!isValidId(userId)) return [];
+
+  try {
+    const col = collection(db, "blockers", userId, "list");
+    const snap = await getDocs(col);
+
+    const result = [];
+
+    snap.forEach(doc => {
+      result.push(doc.id);
+    });
+
+    blockCache.blockers.set(userId, result);
+
+    return result;
+
+  } catch (err) {
+    console.error("getBlockers error:", err);
+    return [];
+  }
+}
+
+// ===============================
+// 🔄 REAL-TIME BLOCKED LISTENER
+// ===============================
+export function listenBlocked(userId, callback) {
+  if (!isValidId(userId)) return () => {};
+
+  const col = collection(db, "blocked", userId, "list");
+
+  return onSnapshot(col, (snap) => {
+    const blocked = [];
+
+    snap.forEach(doc => blocked.push(doc.id));
+
+    blockCache.blocked.set(userId, blocked);
+
+    callback(blocked);
+  });
+}
+
+// ===============================
+// 🔄 REAL-TIME BLOCKERS LISTENER
+// ===============================
+export function listenBlockers(userId, callback) {
+  if (!isValidId(userId)) return () => {};
+
+  const col = collection(db, "blockers", userId, "list");
+
+  return onSnapshot(col, (snap) => {
+    const blockers = [];
+
+    snap.forEach(doc => blockers.push(doc.id));
+
+    blockCache.blockers.set(userId, blockers);
+
+    callback(blockers);
+  });
+}
+
+// ===============================
+// 🚧 FEED FILTER HELPER
+// ===============================
+export async function filterBlockedContent(viewerId, posts = []) {
+  if (!isValidId(viewerId)) return posts;
+
+  try {
+    const blockedUsers = await getBlockedUsers(viewerId);
+
+    if (!blockedUsers.length) return posts;
+
+    return posts.filter(post => {
+      return !blockedUsers.includes(post.userId);
+    });
+
+  } catch (err) {
+    console.error("filterBlockedContent error:", err);
+    return posts;
+  }
+}
+
+// ===============================
+// 🚧 MUTUAL BLOCK CHECK
+// ===============================
+export async function isMutualBlock(userA, userB) {
+  try {
+    const aBlocksB = await isBlocked(userA, userB);
+    const bBlocksA = await isBlocked(userB, userA);
+
+    return aBlocksB && bBlocksA;
+
+  } catch (err) {
+    console.error("isMutualBlock error:", err);
+    return false;
+  }
+}
+
+// ===============================
+// 🧹 CLEAR CACHE
+// ===============================
+export function clearBlockCache() {
+  blockCache.status.clear();
+  blockCache.blocked.clear();
+  blockCache.blockers.clear();
+}
+
+// ===============================
+// 📊 DEBUG CACHE
+// ===============================
+export function debugBlockCache() {
+  return {
+    status: Array.from(blockCache.status.entries()),
+    blocked: Array.from(blockCache.blocked.entries()),
+    blockers: Array.from(blockCache.blockers.entries())
+  };
+}
+
+// ===============================
+// 🧠 SYSTEM READY CHECK
+// ===============================
+export function blockSystemReady() {
+  return typeof db !== "undefined";
+}
+
+// ===============================
+// END MODULE
+// ===============================
