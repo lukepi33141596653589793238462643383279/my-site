@@ -1,5 +1,5 @@
 // =========================
-// 🔥 FIREBASE CORE (FIRESTORE ONLY)
+// 🔥 FIREBASE CORE (FIRESTORE ONLY) - FIXED
 // =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -35,7 +35,7 @@ const db = getFirestore(app);
 
 
 // =========================
-// 💬 CREATE POST (GLOBAL / ROOM SUPPORTED)
+// 💬 CREATE POST (FIXED + SAFE)
 // =========================
 const createPost = async (text, user, room = "global") => {
   try {
@@ -46,7 +46,10 @@ const createPost = async (text, user, room = "global") => {
       user: user.displayName || "anonymous",
       uid: user.uid || null,
       room: room,
-      createdAt: serverTimestamp()
+
+      // 🔥 fallback timestamp (evita bugs de orden)
+      createdAt: serverTimestamp(),
+      localTime: Date.now()
     });
 
   } catch (error) {
@@ -56,16 +59,22 @@ const createPost = async (text, user, room = "global") => {
 
 
 // =========================
-// 📡 LISTEN POSTS (REAL TIME)
+// 📡 LISTEN POSTS (100% SAFE)
 // =========================
 const listenPosts = (callback, room = "global") => {
   try {
     const q = query(
       collection(db, "rooms", room, "messages"),
-      orderBy("createdAt", "desc")
+      orderBy("localTime", "desc") // 🔥 mais estável que serverTimestamp
     );
 
     return onSnapshot(q, (snapshot) => {
+
+      // 🔍 DEBUG IMPORTANTE
+      if (snapshot.empty) {
+        console.log("⚠️ Nenhuma mensagem encontrada no Firestore");
+      }
+
       const messages = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -81,7 +90,7 @@ const listenPosts = (callback, room = "global") => {
 
 
 // =========================
-// 🧠 HELPERS (FUTURO EXPANSÃO)
+// 🧠 HELPERS
 // =========================
 const setRoom = (room) => room || "global";
 
