@@ -1,0 +1,923 @@
+# app.layout.css
+
+```css
+/* =========================================================
+   APP LAYOUT CSS
+   UNIVERSITY CHAT — SOFTWARE ENGINEERING PLATFORM
+   BLUE / BLACK CYBER NEON ARCHITECTURE
+   ========================================================= */
+
+/* =========================================================
+   ROOT APP LAYOUT
+   ========================================================= */
+
+:root {
+  --layout-sidebar-width: 280px;
+  --layout-sidebar-collapsed: 90px;
+  --layout-topbar-height: 72px;
+  --layout-rightbar-width: 360px;
+  --layout-mobile-sidebar: 100%;
+
+  --layout-transition-fast: 0.15s ease;
+  --layout-transition-normal: 0.25s ease;
+  --layout-transition-slow: 0.4s ease;
+
+  --layout-radius-sm: 8px;
+  --layout-radius-md: 14px;
+  --layout-radius-lg: 22px;
+  --layout-radius-xl: 32px;
+
+  --layout-border-primary: rgba(90, 140, 255, 0.18);
+  --layout-border-secondary: rgba(255, 255, 255, 0.06);
+
+  --layout-shadow-soft:
+    0 0 10px rgba(0, 140, 255, 0.12),
+    0 0 25px rgba(0, 0, 0, 0.45);
+
+  --layout-shadow-heavy:
+    0 0 20px rgba(0, 140, 255, 0.2),
+    0 0 50px rgba(0, 0, 0, 0.7);
+}
+
+/* =========================================================
+   RESET LAYOUT
+   ========================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #030712;
+}
+
+body {
+  position: relative;
+  font-family: Inter, sans-serif;
+  color: #dce7ff;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background:
+    radial-gradient(circle at top left, rgba(0, 89, 255, 0.18), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(0, 195, 255, 0.12), transparent 30%),
+    linear-gradient(145deg, #02040a 0%, #050a18 45%, #071120 100%);
+}
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.app-layout {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns:
+    var(--layout-sidebar-width)
+    1fr
+    var(--layout-rightbar-width);
+  grid-template-rows: 100%;
+  overflow: hidden;
+}
+
+.app-layout.compact {
+  grid-template-columns:
+    var(--layout-sidebar-collapsed)
+    1fr
+    var(--layout-rightbar-width);
+}
+
+.app-layout.no-rightbar {
+  grid-template-columns:
+    var(--layout-sidebar-width)
+    1fr;
+}
+
+/* =========================================================
+   LEFT SIDEBAR
+   ========================================================= */
+
+.left-sidebar {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  border-right: 1px solid var(--layout-border-primary);
+
+  background:
+    linear-gradient(180deg,
+      rgba(5, 15, 35, 0.98) 0%,
+      rgba(3, 10, 24, 0.98) 100%);
+
+  backdrop-filter: blur(18px);
+  box-shadow: var(--layout-shadow-soft);
+
+  z-index: 50;
+}
+
+.left-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 132, 255, 0.08) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 132, 255, 0.05) 100%
+    );
+
+  pointer-events: none;
+}
+
+.left-sidebar.collapsed {
+  align-items: center;
+}
+
+.left-sidebar.collapsed .sidebar-label,
+.left-sidebar.collapsed .sidebar-description,
+.left-sidebar.collapsed .sidebar-section-title {
+  display: none;
+}
+
+/* =========================================================
+   SIDEBAR HEADER
+   ========================================================= */
+
+.sidebar-header {
+  width: 100%;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sidebar-brand img {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  object-fit: cover;
+
+  border: 1px solid rgba(0,140,255,0.2);
+
+  box-shadow:
+    0 0 18px rgba(0,140,255,0.3),
+    0 0 40px rgba(0,0,0,0.6);
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+}
+
+.sidebar-brand-subtitle {
+  font-size: 0.75rem;
+  color: #6ea8ff;
+}
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+   ========================================================= */
+
+.sidebar-navigation {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 18px 14px 120px 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-navigation::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-navigation::-webkit-scrollbar-thumb {
+  background: rgba(0, 119, 255, 0.3);
+  border-radius: 999px;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-section-title {
+  padding: 0 10px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+
+  color: rgba(180, 210, 255, 0.65);
+}
+
+.sidebar-item {
+  position: relative;
+
+  width: 100%;
+  min-height: 54px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 0 14px;
+
+  border-radius: 18px;
+  cursor: pointer;
+
+  transition:
+    background var(--layout-transition-normal),
+    transform var(--layout-transition-fast),
+    border var(--layout-transition-normal);
+
+  border: 1px solid transparent;
+}
+
+.sidebar-item:hover {
+  transform: translateX(3px);
+
+  background: rgba(0, 110, 255, 0.08);
+
+  border: 1px solid rgba(0, 132, 255, 0.16);
+}
+
+.sidebar-item.active {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,132,255,0.18),
+      rgba(0,132,255,0.06)
+    );
+
+  border: 1px solid rgba(0,132,255,0.24);
+
+  box-shadow:
+    inset 0 0 18px rgba(0,132,255,0.12),
+    0 0 18px rgba(0,132,255,0.12);
+}
+
+.sidebar-icon {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1rem;
+
+  color: #7db5ff;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #eaf2ff;
+}
+
+.sidebar-description {
+  font-size: 0.72rem;
+  color: rgba(210,225,255,0.55);
+}
+
+/* =========================================================
+   MAIN CONTENT AREA
+   ========================================================= */
+
+.main-content {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.main-content::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at top, rgba(0,140,255,0.06), transparent 30%),
+    radial-gradient(circle at bottom, rgba(0,195,255,0.05), transparent 25%);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.topbar {
+  width: 100%;
+  min-height: var(--layout-topbar-height);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 26px;
+
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6,12,24,0.94),
+      rgba(4,10,18,0.94)
+    );
+
+  backdrop-filter: blur(20px);
+
+  z-index: 20;
+}
+
+.topbar-left,
+.topbar-center,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.topbar-subtitle {
+  font-size: 0.8rem;
+  color: rgba(210,225,255,0.58);
+}
+
+.topbar-button {
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.02);
+
+  transition:
+    background var(--layout-transition-fast),
+    border var(--layout-transition-fast),
+    transform var(--layout-transition-fast);
+}
+
+.topbar-button:hover {
+  transform: translateY(-2px);
+
+  background: rgba(0,132,255,0.08);
+
+  border: 1px solid rgba(0,132,255,0.18);
+}
+
+/* =========================================================
+   CONTENT WRAPPER
+   ========================================================= */
+
+.content-wrapper {
+  flex: 1;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+
+  overflow: hidden;
+}
+
+.content-feed {
+  flex: 1;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.content-feed::-webkit-scrollbar {
+  width: 7px;
+}
+
+.content-feed::-webkit-scrollbar-thumb {
+  background: rgba(0,132,255,0.22);
+  border-radius: 999px;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.layout-card {
+  position: relative;
+
+  width: 100%;
+
+  padding: 24px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10,18,34,0.94),
+      rgba(6,12,24,0.96)
+    );
+
+  border: 1px solid rgba(0,132,255,0.12);
+
+  box-shadow: var(--layout-shadow-soft);
+
+  overflow: hidden;
+}
+
+.layout-card::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.02),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+.layout-card:hover {
+  border: 1px solid rgba(0,132,255,0.22);
+
+  box-shadow: var(--layout-shadow-heavy);
+}
+
+.layout-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.layout-card-description {
+  margin-top: 6px;
+
+  font-size: 0.84rem;
+  line-height: 1.6;
+
+  color: rgba(210,225,255,0.62);
+}
+
+/* =========================================================
+   RIGHT SIDEBAR
+   ========================================================= */
+
+.right-sidebar {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 24px 18px 120px 18px;
+
+  border-left: 1px solid rgba(255,255,255,0.05);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6,12,24,0.98),
+      rgba(3,8,18,0.98)
+    );
+
+  backdrop-filter: blur(20px);
+}
+
+.right-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0,132,255,0.25);
+  border-radius: 999px;
+}
+
+/* =========================================================
+   PROFILE PREVIEW
+   ========================================================= */
+
+.profile-preview {
+  width: 100%;
+
+  padding: 20px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(9,18,38,0.95),
+      rgba(5,10,22,0.98)
+    );
+
+  border: 1px solid rgba(0,132,255,0.14);
+}
+
+.profile-banner {
+  width: 100%;
+  height: 120px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0,132,255,0.3),
+      rgba(0,195,255,0.12)
+    );
+}
+
+.profile-avatar {
+  width: 96px;
+  height: 96px;
+
+  margin-top: -40px;
+
+  border-radius: 50%;
+
+  border: 5px solid #061120;
+
+  object-fit: cover;
+
+  box-shadow:
+    0 0 25px rgba(0,132,255,0.25);
+}
+
+.profile-name {
+  margin-top: 14px;
+
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profile-username {
+  margin-top: 4px;
+
+  font-size: 0.82rem;
+  color: rgba(210,225,255,0.6);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1400px) {
+  .app-layout {
+    grid-template-columns:
+      250px
+      1fr
+      320px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .right-sidebar {
+    display: none;
+  }
+
+  .app-layout {
+    grid-template-columns:
+      var(--layout-sidebar-width)
+      1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .left-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+
+    width: var(--layout-mobile-sidebar);
+
+    transition: left var(--layout-transition-normal);
+  }
+
+  .left-sidebar.mobile-open {
+    left: 0;
+  }
+
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .content-feed {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .layout-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .topbar-title {
+    font-size: 1rem;
+  }
+
+  .sidebar-item {
+    min-height: 48px;
+  }
+}
+
+/* =========================================================
+   CYBER GLOW SYSTEM
+   ========================================================= */
+
+.glow-blue {
+  box-shadow:
+    0 0 12px rgba(0,132,255,0.3),
+    0 0 24px rgba(0,132,255,0.18);
+}
+
+.glow-cyan {
+  box-shadow:
+    0 0 14px rgba(0,195,255,0.25),
+    0 0 28px rgba(0,195,255,0.12);
+}
+
+.glow-panel {
+  position: relative;
+}
+
+.glow-panel::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  border: 1px solid rgba(0,132,255,0.08);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   GRID HELPERS
+   ========================================================= */
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* =========================================================
+   FLEX HELPERS
+   ========================================================= */
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-gap-sm {
+  gap: 8px;
+}
+
+.flex-gap-md {
+  gap: 14px;
+}
+
+.flex-gap-lg {
+  gap: 22px;
+}
+
+/* =========================================================
+   SPACING HELPERS
+   ========================================================= */
+
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+.mt-6 { margin-top: 24px; }
+
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-5 { margin-bottom: 20px; }
+.mb-6 { margin-bottom: 24px; }
+
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.p-5 { padding: 20px; }
+.p-6 { padding: 24px; }
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes cyberPulse {
+  0% {
+    box-shadow:
+      0 0 0 rgba(0,132,255,0.0);
+  }
+
+  50% {
+    box-shadow:
+      0 0 24px rgba(0,132,255,0.22);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 rgba(0,132,255,0.0);
+  }
+}
+
+@keyframes fadeInLayout {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade {
+  animation: fadeInLayout 0.4s ease;
+}
+
+.animate-left {
+  animation: slideLeft 0.4s ease;
+}
+
+.animate-right {
+  animation: slideRight 0.4s ease;
+}
+
+.animate-pulse {
+  animation: cyberPulse 2s infinite;
+}
+
+/* =========================================================
+   END OF FILE
+   ========================================================= */
+```
+
+# Estrutura atual do layout
+
+* Sidebar esquerda modular
+* Topbar cyber/neon
+* Feed principal responsivo
+* Sidebar direita para perfil/widgets
+* Sistema de cards reutilizáveis
+* Grid helpers
+* Flex helpers
+* Responsividade completa
+* Glow system cyber blue
+* Estrutura preparada para integração com:
+
+  * profiles.db.js
+  * feed.db.js
+  * messages.db.js
+  * notifications.db.js
+  * permissions.db.js
+  * themes system
